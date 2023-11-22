@@ -11,8 +11,15 @@
     <meta name="description" content="学生成绩分析"> <!--描述-->
     <meta name="author" content="罗文烨、李朝晖、沈志鸣"> <!--作者-->
     <link rel="icon" href="favicon.ico"> <!--图标-->
-    <script src="script.js"></script> <!--引入js文件-->
-    <link rel="stylesheet" type="text/css" href="style.css"> <!--引入css文件-->
+    <link rel="stylesheet" type="text/css" href="css/main.css"> <!--引入css文件-->
+    <script src="js/main.js"></script> <!--引入js文件-->
+    <script src="js/jquery-3.7.1.min.js"></script> <!--引入jquery文件-->
+    <!--顶端导航栏-->
+    <script>
+        $(function () {
+            $("#navbar").load("navbar.html");
+        });
+    </script>
 </head>
 
 <!--头部标签结束-->
@@ -20,11 +27,9 @@
 <!--主体标签开始-->
 
 <body>
+    <div id="navbar"></div>
     <div class="container">
         <div class="header">
-            <div class="logo">
-                <img src="logo.png" alt="logo">
-            </div>
             <div class="title">
                 <h1>学生成绩分析</h1>
             </div>
