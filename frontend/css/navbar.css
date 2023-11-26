@@ -5,12 +5,18 @@
     overflow: auto;
     display: flex;
     justify-content: flex-start;
+    height: 2em;
     padding: 0.625em 0;
     box-shadow: 0 0.125em 0.25em 0 rgba(0, 0, 0, 0.1);
 }
 
 .nav-logo {
-    padding-left: 5em;
+    height: 100%;
+    margin-right: 0.625em;
+}
+
+.nav-logo img {
+    height: 100%;
 }
 
 .nav-item {
