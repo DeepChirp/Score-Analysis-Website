@@ -42,6 +42,18 @@ semester_to_id ={
     "高三下": 6
 }
 
+subjects = {
+    "chinese": 1,
+    "math": 2,
+    "english": 3,
+    "physics": 4,
+    "chemistry": 5,
+    "biology": 6,
+    "politic": 7,
+    "history": 8,
+    "geography": 9
+}
+
 with open("../data/old_student_class", "r") as f:
     old_student_class = json.loads(f.read())
     class_sql = "INSERT INTO students (class, class_divide, grade_id, name) VALUES (?, 0, ?, ?)"
@@ -114,32 +126,11 @@ for filename in os.listdir("../data/csv"):
                 exams_to_id["{}_{}".format(semester_name, exam_name)] = exam_id
 
             semester_id = semester_to_id[semester_name]
-            if chinese.strip() != "/":
-                chinese_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(chinese_sql, (student_id, exam_id, 1, semester_id, float(chinese)))
-            if math.strip() != "/":
-                math_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(math_sql, (student_id, exam_id, 2, semester_id, float(math)))
-            if english.strip() != "/":
-                english_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(english_sql, (student_id, exam_id, 3, semester_id, float(english)))
-            if physics.strip() != "/":
-                physics_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(physics_sql, (student_id, exam_id, 4, semester_id, float(physics)))
-            if chemistry.strip() != "/":
-                chemistry_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(chemistry_sql, (student_id, exam_id, 5, semester_id, float(chemistry)))
-            if biology.strip() != "/":
-                biology_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(biology_sql, (student_id, exam_id, 6, semester_id, float(biology)))
-            if politic.strip() != "/":
-                politic_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(politic_sql, (student_id, exam_id, 7, semester_id, float(politic)))
-            if history.strip() != "/":
-                history_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(history_sql, (student_id, exam_id, 8, semester_id, float(history)))
-            if geography.strip() != "/":
-                geography_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(geography_sql, (student_id, exam_id, 9, semester_id, float(geography)))
+            for subject, subject_id in subjects.items():
+                score = row[subject].strip()
+                if score != "/":
+                    sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                    cur.execute(sql, (student_id, exam_id, subject_id, semester_id, float(score)))
 
 conn.commit()
+conn.close()
