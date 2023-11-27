@@ -12,6 +12,10 @@ $(function () {
             $.get(url, function (data) {
                 // 将加载的内容插入到 .content 元素中
                 $('.content').html(data);
+
+                // 更新页面标题
+                var title = $(data).filter('title').text();
+                $('head title').text(title);
             });
 
             // 改变地址栏的 URL
