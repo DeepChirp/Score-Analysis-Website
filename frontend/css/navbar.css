@@ -25,6 +25,9 @@
     padding: 0.625em 1.25em;
     border-radius: 1.25em;
     transition: background-color 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .nav-item a {
