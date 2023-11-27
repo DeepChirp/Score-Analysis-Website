@@ -1,0 +1,14 @@
+backend/app/.idea
+backend/app/venv
+
+*.pyc
+__pycache__/
+
+backend/app/instance
+.pytest_cache/
+.coverage
+htmlcov/
+
+dist/
+build/
+*.egg-info/
