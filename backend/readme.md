@@ -1,8 +1,12 @@
-# Backend Daemon V0.1.1
+# Backend Daemon V0.2.0
 
-Fix some bugs in scores API implementation.
+- Change API to V0.2.0
+- Fix some bugs in scores API implementation (in V0.1.1).
 
-# API V0.1.0
+# API V0.2.0
+
+## V0.2.0改动
+- analysis中新增classAvgScore、classAvgStd、classAvgRank
 
 SubjectId与科目名称对照表：
 |SubjectId|SubjectName|
@@ -120,6 +124,9 @@ SubjectAnalysisResultObject:
 |last10AvgScore|Double，该科目班级后十的平均分|-|
 |last10AvgRank|Int，该科目班级后十的平均分的年级排名|-|
 |last10Std|Double，该科目班级后十分数的标准差|-|
+|classAvgScore|Double，该科目全班的平均分|-|
+|classStd|Double，该科目全班的标准差|-|
+|classAvgRank|Int，该科目全班的平均分的年级排名|-|
 |lastId|Int，该科目班级后一的学生的id|-|
 |lastName|String，该科目班级后一的学生的姓名|-|
 |lastScore|Double，该科目班级后一的学生的分数|-|

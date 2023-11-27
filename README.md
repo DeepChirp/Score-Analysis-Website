@@ -1,6 +1,7 @@
 # A website for grades analysis
 
-Deploy to: https://groupwork.xiran.xyz
+Deployed to: https://groupwork.xiran.xyz
+Pushing to main branch will trigger a redeploy of the server using github actions and webhook, so changes can be seen in "realtime" (Although **queued** github actions may impose a large delay).
 ---
 - backend: backend code (python + flask)
 - frontend: 

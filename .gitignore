@@ -1,5 +1,6 @@
 backend/app/.idea
 backend/app/venv
+.idea
 
 *.pyc
 __pycache__/
