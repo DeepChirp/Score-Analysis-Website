@@ -16,24 +16,28 @@ services:
     ports:
       - "3306:3306"
 
-  #backend:
-   # build: backend/app
-    #container_name: backend_app
-    #restart: always
-    #environment:
-    #  TZ: Asia/Shanghai
+  backend:
+    build: backend/app
+    container_name: grades_backend_app
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+      DB_HOST: db
+      DB_USER: grades
+      DB_PASSWORD: grades
+      DB_DATABASE: grades
 
-  #proxy:
-  #  image: nginx
-  #  volumes:
-  #    - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-  #    - ./frontend:/static
-  #    - ./nginx/cert:/cert
-  #  environment:
-  #    TZ: Asia/Shanghai
-  #  ports:
-  #    - "80:80"
-  #    - "443:443"
+  proxy:
+    image: nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./frontend:/static
+      - ./nginx/cert:/cert
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+      - "80:80"
+      - "443:443"
 
 
 volumes:

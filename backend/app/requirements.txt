@@ -1,0 +1,11 @@
+blinker
+click
+Flask
+itsdangerous
+Jinja2
+mariadb
+MarkupSafe
+numpy
+packaging
+Werkzeug
+gunicorn
