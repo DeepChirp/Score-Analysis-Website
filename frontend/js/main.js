@@ -35,4 +35,6 @@ $(function () {
             history.pushState(null, null, url);
         });
     });
+    // 加载页面尾部
+    $("#footer").load("footer.html");
 });
