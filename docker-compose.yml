@@ -11,7 +11,7 @@ services:
       TZ: Asia/Shanghai
     volumes:
       - mariadb_data:/var/lib/mysql
-      - .backend/db/init:/docker-entrypoint-initdb.d
+      - ./backend/db/init:/docker-entrypoint-initdb.d
     restart: always
     ports:
       - "3306:3306"
