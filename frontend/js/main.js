@@ -1,4 +1,4 @@
-// 顶端导航栏
+// 顶端导航栏和底部页脚的加载
 $(function () {
     $("#navbar").load("navbar.html", function () {
         // 绑定导航栏按钮和 logo 的点击事件
