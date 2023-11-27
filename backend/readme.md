@@ -1,3 +1,7 @@
+# Backend Daemon V0.1.1
+
+Fix some bugs in scores API implementation.
+
 # API V0.1.0
 
 SubjectId与科目名称对照表：

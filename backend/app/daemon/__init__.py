@@ -13,16 +13,18 @@ def create_app(test_config=None):
     else:
         app.config.from_mapping(test_config)
 
-    app.config.from_envvar("DB_HOST")
-    app.config.from_envvar("DB_USER")
-    app.config.from_envvar("DB_PASSWORD")
-    app.config.from_envvar("DB_DATABASE")
-
     try:
         os.makedirs(app.instance_path)
     except OSError:
         pass
 
+    app.config.from_mapping({
+        "DB_HOST": os.environ.get("DB_HOST"),
+        "DB_USER": os.environ.get("DB_USER"),
+        "DB_PASSWORD": os.environ.get("DB_PASSWORD"),
+        "DB_DATABASE": os.environ.get("DB_DATABASE")
+
+    })
     from . import db
     db.init_app(app)
 

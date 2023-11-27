@@ -1,8 +1,9 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
+    Blueprint, flash, g, redirect, render_template, request, session, url_for, jsonify
 )
 import numpy
 from daemon.db import get_db
+import json
 
 bp = Blueprint("scores", __name__, url_prefix="/scores")
 
@@ -12,23 +13,23 @@ def get_basic_info_by_class(class_id, exam_id):
     # SELECT class, COUNT(student_id) FROM (SELECT DISTINCT student_id FROM scores WHERE exam_id = 46) AS t INNER JOIN students ON t.student_id = students.id GROUP BY students.class;
     db = get_db()
     cur = db.cursor()
-    sql = "SELECT student_id, COUNT(*) " \
+    sql = "SELECT COUNT(*) " \
           "FROM ( " \
           "SELECT student_id " \
           "FROM scores " \
           "WHERE exam_id = ?  " \
           "GROUP BY student_id " \
           "HAVING COUNT(id) >= 6 ) " \
-          "AS subquery" \
+          "AS subquery " \
           "INNER JOIN students " \
-          "ON student_id = students.id" \
+          "ON student_id = students.id " \
           "WHERE class = ?"
     cur.execute(sql, (exam_id, class_id))
     data = list(cur)
-    if len(data) == 0 or data[0][0] is None:
-        ret = {"code": 404, "msg": "Not Found", "data": {}}
+    if len(data) == 0 or data[0][0] is None or data[0][0] == 0:
+        ret = {"code": 404, "msg": "Not Found.", "data": {}}
     else:
-        ret = {"code": 200, "msg": "Ok", "data": {"validNum": data[0][0]}}
+        ret = {"code": 200, "msg": "Ok.", "data": {"validNum": data[0][0]}}
     return ret
 
 
@@ -53,7 +54,7 @@ def get_data_by_class(class_id, exam_id):
     data = list(cur)
 
     if len(data) == 0:
-        ret = {"code": 404, "msg": "Not Found", "data": {}}
+        ret = {"code": 404, "msg": "Not Found.", "data": {}}
     else:
         result = {}
         for name, subject_id, value in data:
@@ -62,7 +63,7 @@ def get_data_by_class(class_id, exam_id):
         result_lst = []
         for name, scores in result.items():
             result_lst.append({"name": name, "scores": scores})
-        ret = {"code": 200, "msg": "Ok", "data": {"scores": result_lst}}
+        ret = {"code": 200, "msg": "Ok.", "data": {"scores": result_lst}}
 
     return ret
 
@@ -94,7 +95,7 @@ def get_analysis_by_class(class_id, exam_id):
                       "AND class = ? " \
                       "AND scores.student_id IN ((SELECT student_id FROM scores WHERE exam_id = ? GROUP BY student_id HAVING COUNT(id) >= 6)) " \
                       "AND subject_id = ? " \
-                      "ORDER BY value DESC" \
+                      "ORDER BY value DESC " \
                       "LIMIT 10"
         cur.execute(first10_sql, (exam_id, subject_id, exam_id, class_id, exam_id, subject_id))
         data = list(cur)
@@ -271,21 +272,23 @@ def get_analysis_by_class(class_id, exam_id):
         first10_total_ranks.append(grade_rank)
     first10_total_avg = numpy.average(first10_total_scores)
     first10_total_std = numpy.std(first10_total_scores)
-    total_avg_rank_sql = "SELECT RANK() OVER (ORDER BY tvalue DESC) " \
-                         "FROM (SELECT student_id, name, SUM(value) AS tvalue FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = 46 GROUP BY name ORDER BY SUM(value) DESC) AS t " \
-                         "WHERE tvalue = ?"
-    cur.execute(total_avg_rank_sql, (int(first10_total_avg),))
+    total_avg_rank_sql = "SELECT DISTINCT rank FROM " \
+                         "((SELECT SUM(scores.value) AS s, RANK() OVER (ORDER BY SUM(scores.value) DESC) AS rank FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = ? GROUP BY students.name) as r) " \
+                         "WHERE s = ?"
+    cur.execute(total_avg_rank_sql, (exam_id, int(first10_total_avg),))
     data = list(cur)
     if len(data) == 0 or data[0][0] is None:
         total_avg_rank_sql2 = "SELECT COUNT(*) " \
-                              "FROM (SELECT SUM(value) AS value FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = 46 GROUP BY name ORDER BY SUM(value) DESC) AS t " \
+                              "FROM (SELECT SUM(value) AS value FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = ? GROUP BY name ORDER BY SUM(value) DESC) AS t " \
                               "WHERE value >= ?"
-        cur.execute(total_avg_rank_sql2, (first10_total_avg,))
+        cur.execute(total_avg_rank_sql2, (exam_id, first10_total_avg,))
         data = list(cur)
         if data[0][0] == 0:
             first10_total_avg_rank = 1
         else:
             first10_total_avg_rank = data[0][0]
+    else:
+        first10_total_avg_rank = data[0][0]
 
     subject_info = subject_result.setdefault("255", {})
     first10_total_info = []
@@ -347,15 +350,15 @@ def get_analysis_by_class(class_id, exam_id):
     last10_total_avg = numpy.average(last10_total_scores)
     last10_total_std = numpy.std(last10_total_scores)
     total_avg_rank_sql = "SELECT RANK() OVER (ORDER BY tvalue DESC) " \
-                         "FROM (SELECT student_id, name, SUM(value) AS tvalue FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = 46 GROUP BY name ORDER BY SUM(value) DESC) AS t " \
+                         "FROM (SELECT student_id, name, SUM(value) AS tvalue FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = ? GROUP BY name ORDER BY SUM(value) DESC) AS t " \
                          "WHERE tvalue = ?"
-    cur.execute(total_avg_rank_sql, (int(last10_total_avg),))
+    cur.execute(total_avg_rank_sql, (exam_id, int(last10_total_avg),))
     data = list(cur)
     if len(data) == 0 or data[0][0] is None:
         total_avg_rank_sql2 = "SELECT COUNT(*) " \
-                              "FROM (SELECT SUM(value) AS value FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = 46 GROUP BY name ORDER BY SUM(value) DESC) AS t " \
+                              "FROM (SELECT SUM(value) AS value FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = ? GROUP BY name ORDER BY SUM(value) DESC) AS t " \
                               "WHERE value >= ?"
-        cur.execute(total_avg_rank_sql2, (last10_total_avg,))
+        cur.execute(total_avg_rank_sql2, (exam_id, last10_total_avg,))
         data = list(cur)
         if data[0][0] == 0:
             last10_total_avg_rank = 1
@@ -389,12 +392,14 @@ def get_analysis_by_class(class_id, exam_id):
     cur.execute(last_total_sql, (exam_id, exam_id, class_id))
     data = list(cur)
     last_id, last_name, last_score, last_rank = data[0]
-    subject_info["firstId"] = last_id
-    subject_info["firstName"] = last_name
-    subject_info["firstScore"] = last_score
-    subject_info["firstRank"] = last_rank
-
-    return {"code": 200, "msg": "Ok.", "data": subject_result}
+    subject_info["lastId"] = last_id
+    subject_info["lastName"] = last_name
+    subject_info["lastScore"] = last_score
+    subject_info["lastRank"] = last_rank
+    result = {"code": 200, "msg": "Ok.", "data": subject_result}
+    # Flask's jsonify() seems to be broken, so I use json.dumps() instead.
+    # TypeError: '<' not supported between instances of 'str' and 'int'
+    return json.dumps(result), 200, {'Content-Type': 'text/css; charset=utf-8'}
 
 @bp.route("data/by_person/<int:student_id>/exam/<int:exam_id>", methods=("GET",))
 def get_data_by_person(student_id, exam_id):
