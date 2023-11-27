@@ -1,4 +1,6 @@
 # A website for grades analysis
+
+Deploy to: https://groupwork.xiran.xyz
 ---
 - backend: backend code (python + flask)
 - frontend: 
