@@ -1,12 +1,11 @@
-# Backend Daemon V0.2.0
+# Backend Daemon V0.3.0
 
-- Change API to V0.2.0
-- Fix some bugs in scores API implementation (in V0.1.1).
+- Change API to V0.3.0
 
-# API V0.2.0
+# API V0.3.0
 
-## V0.2.0改动
-- analysis中新增classAvgScore、classAvgStd、classAvgRank
+## V0.3.0改动
+- 新增/basic_info/exam、/basic_info/class/<int:exam_id>
 
 SubjectId与科目名称对照表：
 |SubjectId|SubjectName|
@@ -23,6 +22,66 @@ SubjectId与科目名称对照表：
 |255|六科总分|
 
 ## `/scores`
+### GET `/basic_info/exam`
+Input: None
+
+Output:
+HTTP 状态码始终为200，应根据返回的JSON判断：
+ret:
+|Item|Value|Description|
+|  ----  | ----  | ---- |
+|code|int，API状态码|若查询成功，则为200；若没有一次考试，则为404（正常情况下不会出现）|
+|msg|String，（错误）信息|-|
+|data|dict/Object，查询的数据|详见下|
+
+data:
+|Item|Value|Description|
+|  ----  | ----  | ---- |
+|exams|dict/Object，ExamInfoBySemester|详见下|
+
+ExamInfoBySemester：
+|Item|Value|Description|
+|  ----  | ----  | ---- |
+|1|List，ExamInfoListOfSemester|详见下|
+|2|List，ExamInfoListOfSemester|详见下|
+|...(semester_id)...|List，ExamInfoListOfSemester|-|
+
+ExamInfoListOfSemester：
+内含对应学期的考试
+|Index|Value|Description|
+|  ----  | ----  | ---- |
+|0|dict/Object，ExamInfo|详见下|
+|1|dict/Object，ExamInfo|详见下|
+|2|dict/Object，ExamInfo|详见下|
+|...|dict/Object，ExamInfo|-|
+
+ExamInfo：
+|Item|Value|Description|
+|  ----  | ----  | ---- |
+|examId|Int，本次考试的id|-|
+|semesterId|Int，本学期的id|-|
+|semesterName|String，本学期的名称|e.g高一上，高一下|
+|examName|String，本次考试的名称|不含学期前缀，e.g期中，期末|
+
+### GET `/basic_info/class/<int:exam_id>`
+此API用于：在页面上选择要分析的考试后，可接下来选择要分析的班级
+Input: 
+- <int:exam_id>：欲查询的考试id
+
+Output:
+HTTP 状态码始终为200，应根据返回的JSON判断：
+ret:
+|Item|Value|Description|
+|  ----  | ----  | ---- |
+|code|int，API状态码|若查询成功，则为200；若考试id不存在，则为404|
+|msg|String，（错误）信息|-|
+|data|dict/Object，查询的数据|详见下|
+
+data:
+|Item|Value|Description|
+|  ----  | ----  | ---- |
+|classes|List，参考的班级|每个元素为一个参考的班级的id，保证按升序排列|
+
 ### GET `/basic_info/by_class/<int:class_id>/exam/<int:exam_id>`
 Input:
 - <int:class_id>：欲求班级

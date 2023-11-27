@@ -7,7 +7,53 @@ import json
 
 bp = Blueprint("scores", __name__, url_prefix="/scores")
 
-
+@bp.route("/basic_info/exam", methods=("GET",))
+def get_exam():
+    db = get_db()
+    cur = db.cursor()
+    sql = "SELECT DISTINCT exams.id, semesters.id, semesters.name, exams.name " \
+          "FROM exams " \
+          "INNER JOIN scores " \
+          "ON scores.exam_id = exams.id " \
+          "INNER JOIN semesters " \
+          "ON semesters.id = scores.semester_id"
+    cur.execute(sql)
+    data = list(cur)
+    if len(data) == 0:
+        ret = {"code": 404, "msg": "Not Found.", "data": {}}
+    else:
+        result = {}
+        for exam_id, semester_id, semester_name, exam_name in data:
+            this_semester = result.setdefault(semester_id, [])
+            exam_info = {
+                "examId": exam_id,
+                "semesterId": semester_id,
+                "semesterName": semester_name,
+                "examName": exam_name.split("_")[1]
+            }
+            this_semester.append(exam_info)
+        ret = {"code": 200, "msg": "Ok.", "data": {"exams": result}}
+    return ret
+@bp.route("/basic_info/class/<int:exam_id>", methods=("GET",))
+def get_class(exam_id):
+    db = get_db()
+    cur = db.cursor()
+    sql = "SELECT DISTINCT class " \
+          "FROM scores " \
+          "INNER JOIN students " \
+          "ON scores.student_id = students.id " \
+          "WHERE exam_id = ? " \
+          "ORDER BY class"
+    cur.execute(sql, (exam_id, ))
+    data = list(cur)
+    if len(data) == 0:
+        ret = {"code": 404, "msg": "Not Found.", "data": {}}
+    else:
+        result = []
+        for class_id in data:
+            result.append(class_id[0])
+        ret = {"code": 200, "msg": "Ok.", "data": {"classes": result}}
+    return ret
 @bp.route("/basic_info/by_class/<int:class_id>/exam/<int:exam_id>", methods=("GET",))
 def get_basic_info_by_class(class_id, exam_id):
     # SELECT class, COUNT(student_id) FROM (SELECT DISTINCT student_id FROM scores WHERE exam_id = 46) AS t INNER JOIN students ON t.student_id = students.id GROUP BY students.class;
