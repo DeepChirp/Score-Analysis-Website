@@ -18,9 +18,9 @@ $(function () {
 
                 // 检查提取的内容是否为空
                 if (mainContent) {
-                    console.log('Fetch content successful');
+                    console.log('Content fetched successfully.');
                 } else {
-                    console.log('Fetch content failed');
+                    console.log('Failed to fetch content.');
                 }
 
                 // 将提取的内容插入到当前页面的 .main-content 元素中
