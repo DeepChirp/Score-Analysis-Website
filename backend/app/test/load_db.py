@@ -102,17 +102,19 @@ for filename in os.listdir("../data/csv"):
                     student_id = data[0][0]
                     student_to_id[student_name] = student_id
 
-            if "{}_{}".format(semester_name, exam_name) in exams_to_id:
-                exam_id = exams_to_id["{}_{}".format(semester_name, exam_name)]
+            exam_saved_name = "{}_{}".format(semester_name, exam_name)
+            if exam_saved_name in exams_to_id:
+                exam_id = exams_to_id[exam_saved_name]
             else:
                 exams_sql = "INSERT INTO exams (name) VALUES (?)"
-                cur.execute(exams_sql, (exam_name, ))
+                cur.execute(exams_sql, (exam_saved_name, ))
                 conn.commit()
                 exams_id_sql = "SELECT id FROM exams WHERE name = ?"
-                cur.execute(exams_id_sql, (exam_name, ))
+                cur.execute(exams_id_sql, (exam_saved_name, ))
                 exam_id = list(cur)[0][0]
-                exams_to_id["{}_{}".format(semester_name, exam_name)] = exam_id
+                exams_to_id[exam_saved_name] = exam_id
 
+            print("{}_{}: {}".format(semester_name, exam_name, exam_id))
             semester_id = semester_to_id[semester_name]
             if chinese.strip() != "/":
                 chinese_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
