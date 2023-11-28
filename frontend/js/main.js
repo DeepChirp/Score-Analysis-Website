@@ -34,6 +34,9 @@ $(function () {
     }
 });
 
+// 在首次加载页面时设置初始状态
+history.replaceState({ url: window.location.pathname }, null, window.location.pathname);
+
 function bindNavbarButton() {
     // 绑定导航栏按钮和 logo 的点击事件
     $('.navbar-button').off('click').click(function (e) {
