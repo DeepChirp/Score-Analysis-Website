@@ -571,10 +571,22 @@ def get_data_by_person(student_id, exam_id):
         temp = {}
         for subject_id, value, grade_rank, class_rank in data:
             temp[subject_id] = [value, class_rank, grade_rank]
-        result = []
-        for i in range(10):
-            result.append([0.0, 0, 0])
+        result = {}
         for key, value in temp.items():
             result[key] = value
+
+        total_sql = "SELECT temp.v, temp.rank " \
+                    "FROM(SELECT tvalue.student_id , v, RANK() OVER (ORDER BY tvalue.v DESC) AS rank FROM (SELECT student_id, SUM(value) AS v FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = ? GROUP BY name) AS tvalue) AS temp " \
+                    "WHERE temp.student_id = ?"
+        cur.execute(total_sql, (exam_id, student_id))
+        data = list(cur)
+        total_score, total_grade_rank = data[0]
+        class_rank_sql = "SELECT temp2.rank " \
+                         "FROM(SELECT tvalue.student_id , v, RANK() OVER (ORDER BY tvalue.v DESC) AS rank FROM (SELECT student_id, SUM(value) AS v FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = ? AND class = ? GROUP BY name) AS tvalue) AS temp2 " \
+                         "WHERE temp2.student_id = ?"
+        cur.execute(class_rank_sql, (exam_id, class_id, student_id))
+        data = list(cur)
+        total_class_rank = data[0][0]
+        result[255] = [total_score, total_class_rank, total_grade_rank]
         ret = {"code": 200, "msg": "Ok", "data": {"scores": result}}
     return ret

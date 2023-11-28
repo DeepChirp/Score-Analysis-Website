@@ -2,10 +2,10 @@
 
 - Change API to V0.3.0
 
-# API V0.4.0
+# API V0.5.0
 
-## V0.4.0改动
-- /data/by_class/<int:class_id>/exam/<int:exam_id>的ScoreObject中新增id（学生id）
+## V0.5.0改动
+- /data/by_class/<int:class_id>/exam/<int:exam_id>，修改API接口
 
 SubjectId与科目名称对照表：
 |SubjectId|SubjectName|
@@ -218,7 +218,7 @@ Input:
 Output:
 HTTP 状态码始终为200，应根据返回的JSON判断：
 
-ret:
+ret:    
 |Item|Value|Description|
 |  ----  | ----  | ---- |
 |code|int，API状态码|若student_id不存在，或exam_id不存在，则为404；若查询成功，则为200|
@@ -228,11 +228,11 @@ ret:
 data：
 |Item|Value|Description|
 |  ----  | ----  | ---- |
-|scores|ScoresList(List)，查询的成绩数据|其中每个元素为StudentScoreInfoList(List)详见下|
+|scores|ScoresBySubject(Object/dict)，查询的成绩数据|其中每个元素为StudentScoreInfoList(List)详见下|
 
-ScoresList:
-当学生未选考该科目时，该科目成绩为0
-|Index|Value|Description|
+ScoresBySubject:
+当学生未选考该科目时，该科目将不出现在ScoresBySubject中
+|Item|Value|Description|
 |  ----  | ----  | ---- |
 |0|StudentScoreList, [0.0, 0, 0]|预留|
 |1|StudentScoreList, 语文成绩信息|-|
@@ -244,9 +244,9 @@ ScoresList:
 |7|StudentScoreList, 政治成绩信息|-|
 |8|StudentScoreList, 历史成绩信息|-|
 |9|StudentScoreList, 地理成绩信息|-|
+|255|StudentScoreList, 总分成绩信息|-|
 
 StudentScoreInfoList：
-当学生未选考该科目时，该科目成绩为0
 |Index|Value|Description|
 |  ----  | ----  | ---- |
 |0|Double, 该科目成绩|-|
