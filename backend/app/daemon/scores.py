@@ -590,3 +590,23 @@ def get_data_by_person(student_id, exam_id):
         result[255] = [total_score, total_class_rank, total_grade_rank]
         ret = {"code": 200, "msg": "Ok", "data": {"scores": result}}
     return ret
+
+@bp.route("/data/by_person/<int:student_id>/exam", methods=("GET",))
+def get_exam_by_person(student_id):
+    db = get_db()
+    cur = db.cursor()
+    sql = "SELECT exam_id " \
+          "FROM scores " \
+          "INNER JOIN students " \
+          "ON scores.student_id = students.id " \
+          "WHERE student_id = ? " \
+          "GROUP BY exam_id " \
+          "HAVING COUNT(*) >= 6"
+    cur.execute(sql, (student_id, ))
+    data = list(cur)
+    if len(data) == 0 or data[0][0] is None:
+        ret = {"code": 404, "msg": "Not Found.", "data": {}}
+    else:
+        result = [x[0] for x in data]
+        ret = {"code": 200, "msg": "Ok.", "data": {"exams": result}}
+    return ret
