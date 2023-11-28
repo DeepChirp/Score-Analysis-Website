@@ -1,4 +1,28 @@
 // 顶端导航栏和底部页脚的加载
+let navbarHtml = null;
+let footerHtml = null;
+
+// 避免重复获取导航栏和页脚的 HTML 内容
+$(function () {
+    if (navbarHtml === null) {
+        $("#navbar").load("navbar.html", function (response) {
+            navbarHtml = response;
+            bindNavbarButton();
+        });
+    } else {
+        $("#navbar").html(navbarHtml);
+        bindNavbarButton();
+    }
+
+    if (footerHtml === null) {
+        $("#footer").load("footer.html", function (response) {
+            footerHtml = response;
+        });
+    } else {
+        $("#footer").html(footerHtml);
+    }
+});
+
 $(function () {
     $("#navbar").load("navbar.html", function () {
         // 绑定导航栏按钮和 logo 的点击事件
