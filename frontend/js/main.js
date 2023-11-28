@@ -1,7 +1,3 @@
-// 顶端导航栏和底部页脚的加载
-let navbarHtml = null;
-let footerHtml = null;
-
 // Script necessary for every page
 
 // Do not hardcode request URL in js file.
@@ -10,6 +6,10 @@ let footerHtml = null;
 // fetch(url).then(() => {...});
 const protocolPrefix = window.location.protocol + "//";
 const host = window.location.host;
+
+// 顶端导航栏和底部页脚的加载
+let navbarHtml = null;
+let footerHtml = null;
 
 // 避免重复加载导航栏和页脚
 $(function () {
@@ -42,6 +42,22 @@ function bindNavbarButton() {
         // 获取要加载的页面的 URL
         var url = $(this).attr('href');
 
+        // 加载页面内容
+        loadPageContent(url);
+
+        // 改变地址栏的 URL
+        history.pushState({ url: url }, null, url);
+    });
+
+    // 监听 popstate 事件
+    window.addEventListener('popstate', function (e) {
+        if (e.state && e.state.url) {
+            // 加载页面内容
+            loadPageContent(e.state.url);
+        }
+    });
+
+    function loadPageContent(url) {
         // 使用 AJAX 加载页面内容
         $.get(url, function (data) {
             // 将 data 转换为 jQuery 对象
@@ -63,8 +79,5 @@ function bindNavbarButton() {
             var title = $data.filter('title').text();
             $('head title').text(title);
         });
-
-        // 改变地址栏的 URL
-        history.pushState(null, null, url);
-    });
+    }
 }
