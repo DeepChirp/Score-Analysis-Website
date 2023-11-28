@@ -2,6 +2,7 @@
 let navbarHtml = null;
 let footerHtml = null;
 
+// 避免重复获取导航栏和页脚的 HTML 内容
 $(function () {
     if (navbarHtml === null) {
         $("#navbar").load("navbar.html", function (response) {
