@@ -2,10 +2,10 @@
 
 - Change API to V0.3.0
 
-# API V0.3.0
+# API V0.4.0
 
-## V0.3.0改动
-- 新增/basic_info/exam、/basic_info/class/<int:exam_id>
+## V0.4.0改动
+- /data/by_class/<int:class_id>/exam/<int:exam_id>的ScoreObject中新增id（学生id）
 
 SubjectId与科目名称对照表：
 |SubjectId|SubjectName|
@@ -125,6 +125,7 @@ ScoreObject：
 |Item|Value|Description|
 |  ----  | ----  | ---- |
 |name|String，学生姓名|-|
+|id|Int，学生id|-|
 |scores|List，该学生的成绩数据(ScoresList)|详见下|
 
 ScoresList：

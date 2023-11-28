@@ -83,7 +83,7 @@ def get_basic_info_by_class(class_id, exam_id):
 def get_data_by_class(class_id, exam_id):
     db = get_db()
     cur = db.cursor()
-    sql = "SELECT name, subject_id, value " \
+    sql = "SELECT name, scores.student_id, subject_id, value " \
           "FROM scores " \
           "INNER JOIN students " \
           "ON students.id = scores.student_id " \
@@ -103,12 +103,14 @@ def get_data_by_class(class_id, exam_id):
         ret = {"code": 404, "msg": "Not Found.", "data": {}}
     else:
         result = {}
-        for name, subject_id, value in data:
+        student_name_to_id = {}
+        for name, student_id, subject_id, value in data:
             scores = result.setdefault(name, [0] * 10)
             scores[subject_id] = value
+            student_name_to_id[name] = student_id
         result_lst = []
         for name, scores in result.items():
-            result_lst.append({"name": name, "scores": scores})
+            result_lst.append({"name": name, "id": student_name_to_id[name], "scores": scores})
         ret = {"code": 200, "msg": "Ok.", "data": {"scores": result_lst}}
 
     return ret
