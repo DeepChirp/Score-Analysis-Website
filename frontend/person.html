@@ -13,6 +13,7 @@
     <script src="js/jquery-3.7.1.min.js"></script> <!--引入jquery文件-->
     <script src="js/chart-4.4.0.min.js"></script> <!--引入chart.js文件-->
     <script src="js/main.js"></script> <!--引入js文件-->
+    <script src="js/person.js" defer></script>
     <!--脚本标签结束-->
 </head>
 
@@ -38,57 +39,41 @@
                 </div>
             </div>
             <div class="content">
-                <div class="table">
-                    <table border="1" width=100% cellpadding="10">
+                <div class="student-selection-div">
+                        <label for="grade-selection">年级</label>
+                        <select id="grade-selection">
+                            <option>Loading...</option>
+                        </select>
+                        <label for="exam-selection">考试</label>
+                        <select id="exam-selection">
+                            <option>Loading...</option>
+                        </select>
+                        <label for="class-selection">班级</label>
+                        <select id="class-selection">
+                            <option>Loading...</option>
+                        </select>
+                        <label for="student-selection">学生</label>
+                        <input id = "student-selection" list="student-list">
+                        <datalist id="student-list">
+                            <option>Loading...</option>
+                        </datalist>
+                        <button id="student-submit" disabled>查询</button>
+                </div>
+                <div class="student-score-table-div">
+                    <table class="student-score-table" border="1" width=100% cellpadding="10">
                         <caption><b>个人成绩</b></caption>
-                        <tr>
-                            <th>科目</th>
-                            <th>分数</th>
-                            <th>排名</th>
-                            <th>升降</th>
-                        </tr>
-                        <tr>
-                            <th align="center">科目1</th>
-                            <td align="center">分数1</td>
-                            <td align="center">排名1</td>
-                            <td align="center">升降1</td>
-                        </tr>
-                        <tr>
-                            <th align="center">科目2</th>
-                            <td align="center">分数2</td>
-                            <td align="center">排名2</td>
-                            <td align="center">升降2</td>
-                        </tr>
-                        <tr>
-                            <th align="center">科目3</th>
-                            <td align="center">分数3</td>
-                            <td align="center">排名3</td>
-                            <td align="center">升降3</td>
-                        </tr>
-                        <tr>
-                            <th align="center">科目4</th>
-                            <td align="center">分数4</td>
-                            <td align="center">排名4</td>
-                            <td align="center">升降4/td>
-                        </tr>
-                        <tr>
-                            <th align="center">科目5</th>
-                            <td align="center">分数5</td>
-                            <td align="center">排名5</td>
-                            <td align="center">升降5</td>
-                        </tr>
-                        <tr>
-                            <th align="center">科目6</th>
-                            <td align="center">分数6</td>
-                            <td align="center">排名6</td>
-                            <td align="center">升降6</td>
-                        </tr>
-                        <tr>
-                            <th align="center">六科总</th>
-                            <td align="center">分数sum</td>
-                            <td align="center">排名sum</td>
-                            <td align="center">升降sum</td>
-                        </tr>
+                        <thead>
+                            <tr>
+                                <th>科目</th>
+                                <th>分数</th>
+                                <th>班名</th>
+                                <th>级名</th>
+                                <th>升降</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
                     </table>
                 </div>
             </div>

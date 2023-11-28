@@ -7,6 +7,19 @@
 const protocolPrefix = window.location.protocol + "//";
 const host = window.location.host;
 
+const subjectIdToName = {
+    1: "语文",
+    2: "数学",
+    3: "外语",
+    4: "物理",
+    5: "化学",
+    6: "生物",
+    7: "政治",
+    8: "历史",
+    9: "地理",
+    255: "总分"
+};
+
 // 顶端导航栏和底部页脚的加载
 let navbarHtml = null;
 let footerHtml = null;
