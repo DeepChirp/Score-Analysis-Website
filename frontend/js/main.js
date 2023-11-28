@@ -77,7 +77,7 @@ function bindNavbarButton() {
         // 使用 AJAX 加载页面内容
         $.get(url, function (data) {
             // 将 data 转换为 jQuery 对象
-            var $data = $(jQuery.parseHTML(data));
+            var $data = $(jQuery.parseHTML(data, document, true));
 
             // 从加载的内容中提取 .main-content 的内容
             var mainContent = $data.filter('.main-content').add($data.find('.main-content')).html();
@@ -94,6 +94,27 @@ function bindNavbarButton() {
             // 更新页面标题
             var title = $data.filter('title').text();
             $('head title').text(title);
+
+            // 加载新的脚本
+            $data.filter('script').add($data.find('script')).each(function () {
+                var scriptSrc = this.src;
+
+                // 如果脚本没有被加载过，则加载脚本
+                var isScriptLoaded = Array.prototype.some.call(document.scripts, function (script) {
+                    return script.src === scriptSrc;
+                });
+
+                if (!isScriptLoaded) {
+                    var script = document.createElement('script');
+                    if (scriptSrc) {
+                        script.src = scriptSrc;
+                        console.log('Loading new script: ' + scriptSrc);  // 输出新加载的脚本的 src 属性
+                    } else {
+                        script.text = this.innerText;
+                    }
+                    document.head.appendChild(script);
+                }
+            });
         });
     }
 }
