@@ -1,14 +1,14 @@
+var PersonPage = function () {
+    this.examData = null;
+    this.semesterIdToName = {};
+    this.examInfoBySemester = {};
+    this.classListByExamId = {};
+    this.studentListByClassIdByExamId = {};
+    this.studentNameToId = {};
+    this.validExamList = [];
+};
 
-let examData = null;
-
-let semesterIdToName = {};
-let examInfoBySemester = {};
-let classListByExamId = {};
-let studentListByClassIdByExamId = {};
-let studentNameToId = {};
-let validExamList = [];
-
-async function doGetExamInfo() {
+PersonPage.prototype.doGetExamInfo = async function () {
     let response = await fetch(`${protocolPrefix}${host}/api/scores/basic_info/exam`);
     let data = await response.json();
     if (data["code"] == 200) {
@@ -17,9 +17,9 @@ async function doGetExamInfo() {
     else {
         // TODO: Show error message if request failed?
     }
-}
+};
 
-async function doGetClassListByExamId(examId) {
+PersonPage.prototype.doGetClassListByExamId = async function (examId) {
     let response = await fetch(`${protocolPrefix}${host}/api/scores/basic_info/class/${examId}`);
     let data = await response.json();
     if (data["code"] == 200) {
@@ -28,17 +28,17 @@ async function doGetClassListByExamId(examId) {
     else {
         // TODO: Show error message if request failed?
     }
-}
+};
 
-function getExamInfo() {
-    doGetExamInfo().then((data) => {
-        examData = data;
-        examInfoBySemester = data["exams"];
-        for (const [semesterId, examInfoListOfSemester] of Object.entries(examInfoBySemester)) {
+PersonPage.prototype.getExamInfo = function () {
+    this.doGetExamInfo().then((data) => {
+        this.examData = data;
+        this.examInfoBySemester = data["exams"];
+        for (const [semesterId, examInfoListOfSemester] of Object.entries(this.examInfoBySemester)) {
             if (examInfoListOfSemester.length > 0) {
-                thisId = examInfoListOfSemester[0]["semesterId"]
-                thisName = examInfoListOfSemester[0]["semesterName"];
-                semesterIdToName[thisId] = thisName;
+                let thisId = examInfoListOfSemester[0]["semesterId"]
+                let thisName = examInfoListOfSemester[0]["semesterName"];
+                this.semesterIdToName[thisId] = thisName;
             }
         }
 
@@ -47,34 +47,34 @@ function getExamInfo() {
             gradeSelection.removeChild(gradeSelection.firstChild);
         }
 
-        for (const [semesterId, semesterName] of Object.entries(semesterIdToName)) {
+        for (const [semesterId, semesterName] of Object.entries(this.semesterIdToName)) {
             const optionChild = document.createElement("option");
             optionChild.value = semesterId;
             optionChild.textContent = semesterName;
             gradeSelection.appendChild(optionChild);
         }
 
-        updateExamList(gradeSelection.value);
+        this.updateExamList(gradeSelection.value);
         const examSelection = document.querySelector("#exam-selection");
-        updateClassList(examSelection.value);
+        this.updateClassList(examSelection.value);
 
     });
-}
+};
 
-async function doGetPersonData(studentId, examId) {
+PersonPage.prototype.doGetPersonData = async function (studentId, examId) {
     let response = await fetch(`${protocolPrefix}${host}/api/scores/data/by_person/${studentId}/exam/${examId}`);
     let data = await response.json();
     const studentSelection = document.querySelector("#student-selection");
-    await updateValidExamList(studentNameToId[studentSelection.value]);
+    await this.updateValidExamList(this.studentNameToId[studentSelection.value]);
     return data;
 }
 
-function updateExamList(semesterId) {
+PersonPage.prototype.updateExamList = function (semesterId) {
     const examSelection = document.querySelector("#exam-selection");
     while (examSelection.firstChild) {
         examSelection.removeChild(examSelection.firstChild);
     }
-    let temp = examInfoBySemester[semesterId]
+    let temp = this.examInfoBySemester[semesterId]
     for (const examInfoOfSemester of temp) {
         const optionChild = document.createElement("option");
         optionChild.value = examInfoOfSemester["examId"];
@@ -83,13 +83,13 @@ function updateExamList(semesterId) {
     }
 }
 
-function updateClassList(examId) {
+PersonPage.prototype.updateClassList = function (examId) {
     const classSelection = document.querySelector("#class-selection");
-    if (examId in classListByExamId) {
+    if (examId in this.classListByExamId) {
         while (classSelection.firstChild) {
             classSelection.removeChild(classSelection.firstChild);
         }
-        for (const classId of classListByExamId[examId]) {
+        for (const classId of this.classListByExamId[examId]) {
             const optionChild = document.createElement("option");
             optionChild.value = classId;
             optionChild.textContent = classId;
@@ -103,54 +103,54 @@ function updateClassList(examId) {
         const loadingChild = document.createElement("option");
         loadingChild.textContent = "Loading...";
         classSelection.appendChild(loadingChild);
-        doGetClassListByExamId(examId).then((classList) => {
+        this.doGetClassListByExamId(examId).then((classList) => {
             while (classSelection.firstChild) {
                 classSelection.removeChild(classSelection.firstChild);
             }
-            classListByExamId[examId] = classList;
-            for (const classId of classListByExamId[examId]) {
+            this.classListByExamId[examId] = classList;
+            for (const classId of this.classListByExamId[examId]) {
                 const optionChild = document.createElement("option");
                 optionChild.value = classId;
                 optionChild.textContent = classId;
                 classSelection.appendChild(optionChild);
             }
-            updateStudentList(classSelection.value, examSelection.value);
+            this.updateStudentList(classSelection.value, examSelection.value);
         });
     }
 }
 
-async function doGetClassInfo(classId, examId) {
+PersonPage.prototype.doGetClassInfo = async function (classId, examId) {
     let response = await fetch(`${protocolPrefix}${host}/api/scores/data/by_class/${classId}/exam/${examId}`);
     let data = await response.json();
     return data;
 }
 
-function updateStudentList(classId, examId) {
+PersonPage.prototype.updateStudentList = function (classId, examId) {
     const studentSelectionData = document.querySelector("#student-list");
-    if (examId in studentListByClassIdByExamId) {
-        studentListByClassId = studentListByClassIdByExamId[examId];
+    if (examId in this.studentListByClassIdByExamId) {
+        let studentListByClassId = this.studentListByClassIdByExamId[examId];
         if (classId in studentListByClassId) {
             while (studentSelectionData.firstChild) {
                 studentSelectionData.removeChild(studentSelectionData.firstChild);
             }
-            for (const studentName of studentListByClassIdByExamId[examId][classId]) {
+            for (const studentName of this.studentListByClassIdByExamId[examId][classId]) {
                 const optionChild = document.createElement("option");
                 optionChild.value = studentName;
                 optionChild.textContent = studentName;
                 studentSelectionData.appendChild(optionChild);
             }
         } else {
-            doGetClassInfo(classId, examId).then((data) => {
+            this.doGetClassInfo(classId, examId).then((data) => {
                 if (data["code"] === 200) {
-                    studentListByClassIdByExamId[examId][classId] = [];
+                    this.studentListByClassIdByExamId[examId][classId] = [];
                     for (const scoreObject of data["data"]["scores"]) {
-                        studentListByClassIdByExamId[examId][classId].push(scoreObject["name"]);
-                        studentNameToId[scoreObject["name"]] = scoreObject["id"];
+                        this.studentListByClassIdByExamId[examId][classId].push(scoreObject["name"]);
+                        this.studentNameToId[scoreObject["name"]] = scoreObject["id"];
                     }
                     while (studentSelectionData.firstChild) {
                         studentSelectionData.removeChild(studentSelectionData.firstChild);
                     }
-                    for (const studentName of studentListByClassIdByExamId[examId][classId]) {
+                    for (const studentName of this.studentListByClassIdByExamId[examId][classId]) {
                         const optionChild = document.createElement("option");
                         optionChild.value = studentName;
                         optionChild.textContent = studentName;
@@ -162,18 +162,18 @@ function updateStudentList(classId, examId) {
             });
         }
     } else {
-        doGetClassInfo(classId, examId).then((data) => {
+        this.doGetClassInfo(classId, examId).then((data) => {
             if (data["code"] === 200) {
-                studentListByClassIdByExamId[examId] = {};
-                studentListByClassIdByExamId[examId][classId] = [];
+                this.studentListByClassIdByExamId[examId] = {};
+                this.studentListByClassIdByExamId[examId][classId] = [];
                 for (const scoreObject of data["data"]["scores"]) {
-                    studentListByClassIdByExamId[examId][classId].push(scoreObject["name"]);
-                    studentNameToId[scoreObject["name"]] = scoreObject["id"];
+                    this.studentListByClassIdByExamId[examId][classId].push(scoreObject["name"]);
+                    this.studentNameToId[scoreObject["name"]] = scoreObject["id"];
                 }
                 while (studentSelectionData.firstChild) {
                     studentSelectionData.removeChild(studentSelectionData.firstChild);
                 }
-                for (const studentName of studentListByClassIdByExamId[examId][classId]) {
+                for (const studentName of this.studentListByClassIdByExamId[examId][classId]) {
                     const optionChild = document.createElement("option");
                     optionChild.value = studentName;
                     optionChild.textContent = studentName;
@@ -186,21 +186,20 @@ function updateStudentList(classId, examId) {
     }
 }
 
-function updateStudentScoreTable(studentId, examId) {
-    doGetPersonData(studentId, examId).then((data) => {
+PersonPage.prototype.updateStudentScoreTable = function (studentId, examId) {
+    this.doGetPersonData(studentId, examId).then((data) => {
         if (data["code"] === 200) {
             const scoreTbody = document.querySelector(".student-score-table tbody");
             while (scoreTbody.firstChild) {
                 scoreTbody.removeChild(scoreTbody.firstChild);
             }
-            scoresList = data["data"]["scores"];
-            lastExamId = getLastValidExamId(examId);
+            let scoresList = data["data"]["scores"];
+            let lastExamId = this.getLastValidExamId(examId);
 
             // TODO: get rank from last exam
 
-            for (const [subjectId, subjectName] of Object.entries(subjectIdToName)) {
-                if (subjectId in scoresList)
-                {
+            for (const [subjectId, subjectName] of Object.entries(this.subjectIdToName)) {
+                if (subjectId in scoresList) {
                     let score = scoresList[subjectId][0];
                     let classRank = scoresList[subjectId][1];
                     let gradeRank = scoresList[subjectId][2];
@@ -219,37 +218,32 @@ function updateStudentScoreTable(studentId, examId) {
                     thisTr.appendChild(gradeRankTd);
                     scoreTbody.appendChild(thisTr);
                 }
-                
             }
-
-            
-
         } else {
             // TODO: Show error message if request failed?
         }
-        });
+    });
 }
 
-async function doGetExamListByPerson(studentId) {
+PersonPage.prototype.doGetExamListByPerson = async function (studentId) {
     let response = await fetch(`${protocolPrefix}${host}/api/scores/data/by_person/${studentId}/exam`);
     let data = await response.json();
     return data;
 }
 
-async function updateValidExamList(studentId) {
-    data = await doGetExamListByPerson(studentId);
+PersonPage.prototype.updateValidExamList = async function (studentId) {
+    let data = await this.doGetExamListByPerson(studentId);
     if (data["code"] === 200) {
-        validExamList = data["data"]["exams"];
+        this.validExamList = data["data"]["exams"];
     } else {
         // TODO: Show error message if request failed?
     }
-
 }
 
-function getLastValidExamId(examId) {
-    if (validExamList.length > 0) {
+PersonPage.prototype.getLastValidExamId = function (examId) {
+    if (this.validExamList.length > 0) {
         let temp = -1;
-        for (const id of validExamList) {
+        for (const id of this.validExamList) {
             if (id < examId) {
                 temp = id;
             } else {
@@ -262,41 +256,56 @@ function getLastValidExamId(examId) {
     }
 }
 
-getExamInfo();
+PersonPage.prototype.getExamInfo();
 
-const studentSelection = document.querySelector("#student-selection");
-studentSelection.addEventListener("input", (event) => {
-    if (event.target.value.trim() != "") {
-        const submitButton = document.querySelector("#student-submit");
-        submitButton.disabled = false;
+PersonPage.prototype.initEventListeners = function () {
+    const studentSelection = document.querySelector("#student-selection");
+    studentSelection.addEventListener("input", (event) => {
+        if (event.target.value.trim() != "") {
+            const submitButton = document.querySelector("#student-submit");
+            submitButton.disabled = false;
+        }
+    });
+
+    const submitButton = document.querySelector("#student-submit");
+    submitButton.addEventListener("click", () => {
+        this.updateStudentScoreTable(this.studentNameToId[studentSelection.value], examSelection.value);
+    })
+
+    const gradeSelection = document.querySelector("#grade-selection");
+    gradeSelection.addEventListener("change", (event) => {
+        studentSelection.value = "";
+        submitButton.disabled = true;
+        this.updateExamList(event.target.value);
+    });
+
+    const examSelection = document.querySelector("#exam-selection");
+    examSelection.addEventListener("change", (event) => {
+        studentSelection.value = "";
+        submitButton.disabled = true;
+        this.updateClassList(event.target.value);
+    });
+
+    const classSelection = document.querySelector("#class-selection");
+    classSelection.addEventListener("change", (event) => {
+        studentSelection.value = "";
+        submitButton.disabled = true;
+        this.updateStudentList(event.target.value, examSelection.value);
+    });
+}
+
+// 在页面加载完成时，创建 PersonPage 的实例
+$(document).ready(function () {
+    if (window.location.pathname === '/person.html') {
+        window.personPage = new PersonPage();
+        window.personPage.load();
     }
 });
 
-const submitButton = document.querySelector("#student-submit");
-submitButton.addEventListener("click", () => {
-    updateStudentScoreTable(studentNameToId[studentSelection.value], examSelection.value);
-})
-
-const gradeSelection = document.querySelector("#grade-selection");
-gradeSelection.addEventListener("change", (event) => {
-    studentSelection.value = "";
-    submitButton.disabled = true;
-    updateExamList(event.target.value);
+// 在页面卸载时，卸载 PersonPage 的实例
+$(window).on('beforeunload', function () {
+    if (window.personPage) {
+        window.personPage.unload();
+        window.personPage = null;
+    }
 });
-
-const examSelection = document.querySelector("#exam-selection");
-examSelection.addEventListener("change", (event) => {
-    studentSelection.value = "";
-    submitButton.disabled = true;
-    updateClassList(event.target.value);
-});
-
-const classSelection = document.querySelector("#class-selection");
-classSelection.addEventListener("change", (event) => {
-    studentSelection.value = "";
-    submitButton.disabled = true;
-    updateStudentList(event.target.value, examSelection.value);
-});
-
-
-
