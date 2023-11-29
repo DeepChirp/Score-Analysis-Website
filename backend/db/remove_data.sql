@@ -1,0 +1,6 @@
+TRUNCATE TABLE scores;
+TRUNCATE TABLE students;
+TRUNCATE TABLE exams;
+TRUNCATE TABLE subjects;
+TRUNCATE TABLE semesters;
+TRUNCATE TABLE grades;
