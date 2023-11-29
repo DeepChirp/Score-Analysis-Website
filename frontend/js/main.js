@@ -57,7 +57,6 @@ function bindNavbarButton() {
 
         // 获取要加载的页面的 URL
         var url = $(this).attr('href');
-
         // 加载页面内容
         loadPageContent(url);
 
@@ -118,7 +117,7 @@ function bindNavbarButton() {
                 // 如果加载的是 person.html，初始化 PersonPage 实例
                 if (url === 'person.html') {
                     console.log('Initializing PersonPage instance.');
-                    window.personPage = new PersonPage();
+                    window["personPage"] = new PersonPage();
                     window.personPage.initEventListeners();
                 }
             });
