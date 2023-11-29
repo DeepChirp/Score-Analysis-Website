@@ -8,16 +8,12 @@ class PersonPage {
         this.studentNameToId = {};
         this.validExamList = [];
         this.examDetailByPerson = {};
+        this.examIdToName = {};
     }
     async doGetExamInfo() {
         let response = await fetch(`${protocolPrefix}${host}/api/scores/basic_info/exam`);
         let data = await response.json();
-        if (data["code"] == 200) {
-            return data["data"];
-        }
-        else {
-            // TODO: Show error message if request failed?
-        }
+        return data;
     }
     async doGetClassListByExamId(examId) {
         let response = await fetch(`${protocolPrefix}${host}/api/scores/basic_info/class/${examId}`);
@@ -31,31 +27,44 @@ class PersonPage {
     }
     getExamInfo() {
         this.doGetExamInfo().then((data) => {
-            this.examData = data;
-            this.examInfoBySemester = data["exams"];
-            for (const [semesterId, examInfoListOfSemester] of Object.entries(this.examInfoBySemester)) {
-                if (examInfoListOfSemester.length > 0) {
-                    let thisId = examInfoListOfSemester[0]["semesterId"];
-                    let thisName = examInfoListOfSemester[0]["semesterName"];
-                    this.semesterIdToName[thisId] = thisName;
+            if (data["code"] === 200) {
+                this.examData = data["data"];
+
+                
+                this.examInfoBySemester = this.examData["exams"];
+                for (const [semesterId, examInfoListOfSemester] of Object.entries(this.examInfoBySemester)) {
+                    if (examInfoListOfSemester.length > 0) {
+                        let thisId = examInfoListOfSemester[0]["semesterId"];
+                        let thisName = examInfoListOfSemester[0]["semesterName"];
+                        this.semesterIdToName[thisId] = thisName;
+                    }
                 }
-            }
 
-            const gradeSelection = document.querySelector("#grade-selection");
-            while (gradeSelection.firstChild) {
-                gradeSelection.removeChild(gradeSelection.firstChild);
-            }
+                for (const [semesterId, examList] of Object.entries(this.examData["exams"])) {
+                    let semesterName = this.semesterIdToName[semesterId]
+                    for (const exam of examList) {
+                        this.examIdToName[exam["examId"]] = `${semesterName}${exam["examName"]}`;
+                    }
+                }
 
-            for (const [semesterId, semesterName] of Object.entries(this.semesterIdToName)) {
-                const optionChild = document.createElement("option");
-                optionChild.value = semesterId;
-                optionChild.textContent = semesterName;
-                gradeSelection.appendChild(optionChild);
-            }
+                const gradeSelection = document.querySelector("#grade-selection");
+                while (gradeSelection.firstChild) {
+                    gradeSelection.removeChild(gradeSelection.firstChild);
+                }
 
-            this.updateExamList(gradeSelection.value);
-            const examSelection = document.querySelector("#exam-selection");
-            this.updateClassList(examSelection.value);
+                for (const [semesterId, semesterName] of Object.entries(this.semesterIdToName)) {
+                    const optionChild = document.createElement("option");
+                    optionChild.value = semesterId;
+                    optionChild.textContent = semesterName;
+                    gradeSelection.appendChild(optionChild);
+                }
+
+                this.updateExamList(gradeSelection.value);
+                const examSelection = document.querySelector("#exam-selection");
+                this.updateClassList(examSelection.value);
+            } else {
+                // TODO: Show error message if request failed?
+            }
 
         });
     }
@@ -218,6 +227,12 @@ class PersonPage {
                             thisTr.appendChild(deltaClassRankTd);
                             thisTr.appendChild(deltaGradeRankTd);
                         }
+                        else {
+                            deltaClassRankTd.textContent = "-";
+                            deltaGradeRankTd.textContent = "-";
+                            thisTr.appendChild(deltaClassRankTd);
+                            thisTr.appendChild(deltaGradeRankTd);
+                        }
                         scoreTbody.appendChild(thisTr);
                     }
                 }
@@ -273,6 +288,76 @@ class PersonPage {
         }
     }
 
+    drawChart() {
+        const chartDiv = document.querySelector("#student-score-chart-div");
+        while (chartDiv.firstChild) {
+            chartDiv.removeChild(chartDiv.firstChild);
+        }
+        for (const [subjectId, subjectName] of Object.entries(subjectIdToName)) {
+            const thisDiv = document.createElement("div");
+            const scoreCanvas = document.createElement("canvas");
+            const rankCanvas = document.createElement("canvas");
+
+            const scoreContainer = document.createElement("div");
+            scoreContainer.setAttribute("class", "chart-container");
+
+            const rankContainer = document.createElement("div");
+            rankContainer.setAttribute("class", "chart-container");
+
+            const title = document.createElement("h3");
+            title.textContent = subjectName;
+            thisDiv.appendChild(title);
+
+            let labels = [];
+            let scores = [];
+            let gradeRanks = [];
+            for (const [examId, examDetail] of Object.entries(this.examDetailByPerson)) {
+                labels.push(this.examIdToName[examId]);
+                scores.push(examDetail[subjectId][0]);
+                gradeRanks.push(examDetail[subjectId][2]);
+            }
+
+
+            new Chart(scoreCanvas, {
+                type: "line",
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: "分数",
+                            data: scores,
+                            borderColor: "#007bff",
+                            fill: false
+                        }
+                    ]
+                }
+            }
+            );
+
+            new Chart(rankCanvas, {
+                type: "line",
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: "年级排名",
+                            data: gradeRanks,
+                            borderColor: "#007bff",
+                            fill: false
+                        }
+                    ]
+                }
+            }
+            );
+
+            scoreContainer.appendChild(scoreCanvas);
+            rankContainer.appendChild(rankCanvas);
+            thisDiv.appendChild(scoreContainer);
+            thisDiv.appendChild(rankContainer);
+            chartDiv.appendChild(thisDiv);
+        }
+    }
+
     initEventListeners() {
         this.getExamInfo();
         const studentSelection = document.querySelector("#student-selection");
@@ -287,6 +372,7 @@ class PersonPage {
         submitButton.addEventListener("click", () => {
             this.getExamDetailByPerson(this.studentNameToId[studentSelection.value]).then(() => {
                 this.updateStudentScoreTable(this.studentNameToId[studentSelection.value], examSelection.value);
+                this.drawChart();
             });    
         });
 
