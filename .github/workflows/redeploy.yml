@@ -8,7 +8,7 @@ on:
 jobs:
   redeploy:
     name: Redeploy webhook call
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: Deploy docker compose webhook
         uses: joelwmale/webhook-action@master
