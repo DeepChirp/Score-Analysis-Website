@@ -218,10 +218,8 @@ class PersonPage {
                             let lastGradeRank = this.examDetailByPerson[lastExamId][subjectId][2];
                             let deltaClassRank = lastClassRank - classRank;
                             let deltaGradeRank = lastGradeRank - gradeRank;
-                            classRankTd.textContent = `${classRank} (${deltaClassRank >= 0 ? '+' : ''}${deltaClassRank})`;
-                            gradeRankTd.textContent = `${gradeRank} (${deltaGradeRank >= 0 ? '+' : ''}${deltaGradeRank})`;
-                            classRankTd.style.color = deltaClassRank < 0 ? 'red' : 'green';
-                            gradeRankTd.style.color = deltaGradeRank < 0 ? 'red' : 'green';
+                            classRankTd.innerHTML = `${classRank} <span style="color: ${deltaClassRank < 0 ? 'green' : 'red'}">(${deltaClassRank >= 0 ? '+' : ''}${deltaClassRank})</span>`;
+                            gradeRankTd.innerHTML = `${gradeRank} <span style="color: ${deltaGradeRank < 0 ? 'green' : 'red'}">(${deltaGradeRank >= 0 ? '+' : ''}${deltaGradeRank})</span>`;
                         }
                         else {
                             classRankTd.textContent = classRank;
@@ -273,8 +271,7 @@ class PersonPage {
     }
 
     async getExamDetailByPerson(studentId) {
-        if (Object.keys(this.examDetailByPerson).length == 0)
-        {
+        if (Object.keys(this.examDetailByPerson).length == 0) {
             let data = await this.doGetExamDetailByPerson(studentId);
             if (data["code"] === 200) {
                 this.examDetailByPerson = data["data"]["examDetails"];
