@@ -282,5 +282,8 @@ class PersonPage {
     }
 }
 
-//PersonPage.prototype.getExamInfo();
-
+// Create the instance manually when user directly open person page.
+if (!("personPage" in window)) {
+    window["personPage"] = new PersonPage();
+    window.personPage.initEventListeners();
+}
