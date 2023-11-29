@@ -7,3 +7,11 @@
     box-sizing: border-box;
     width: 45%;
 }
+
+tr:nth-child(even) {
+    background-color: #adabab;
+}
+
+tr:nth-child(odd) {
+    background-color: #ffffff;
+}
