@@ -288,15 +288,16 @@ class PersonPage {
         }
         for (const [subjectId, subjectName] of Object.entries(subjectIdToName)) {
             const thisDiv = document.createElement("div");
+            thisDiv.setAttribute("class", "subject-group-div");
             const scoreCanvas = document.createElement("canvas");
             const rankCanvas = document.createElement("canvas");
 
             const scoreContainer = document.createElement("div");
             scoreContainer.setAttribute("class", "chart-container");
-
+            scoreContainer.style.flex = 1;
             const rankContainer = document.createElement("div");
             rankContainer.setAttribute("class", "chart-container");
-
+            rankContainer.style.flex = 1;
             const title = document.createElement("h3");
             title.textContent = subjectName;
             thisDiv.appendChild(title);

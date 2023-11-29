@@ -9,6 +9,10 @@
     width: 45%;
 }
 
+.subject-group-div {
+    display: flex;
+}
+
 thead tr {
     background-color: #adabab;
 }
