@@ -97,7 +97,7 @@ function bindNavbarButton() {
             // 加载新的脚本
             $data.filter('script').add($data.find('script')).each(function () {
                 var scriptSrc = this.src;
-                
+
                 // 如果脚本没有被加载过，则加载脚本
                 var isScriptLoaded = Array.prototype.some.call(document.scripts, function (script) {
                     return script.src === scriptSrc;
@@ -108,17 +108,20 @@ function bindNavbarButton() {
                     if (scriptSrc) {
                         script.src = scriptSrc;
                         console.log('Loading new script: ' + scriptSrc);  // 输出新加载的脚本的 src 属性
+
+                        // 如果是第一次加载 person.js，设置一个标记
+                        if (scriptSrc.endsWith('person.js')) {
+                            window.isPersonJsLoadedFirstTime = true;
+                        }
                     } else {
                         script.text = this.innerText;
                     }
                     document.head.appendChild(script);
                 }
-
-
             });
 
-            // 如果加载的是 person.html，初始化 PersonPage 实例
-            if (url === 'person.html') {
+            // 如果加载的是 person.html，且不是第一次加载 person.js，初始化 PersonPage 实例，并初始化事件监听器
+            if (url === 'person.html' && !window.isPersonJsLoadedFirstTime) {
                 console.log('Initializing PersonPage instance.');
                 window["personPage"] = new PersonPage();
                 window.personPage.initEventListeners();
