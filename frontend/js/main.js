@@ -98,6 +98,7 @@ function bindNavbarButton() {
             $data.filter('script').add($data.find('script')).each(function () {
                 var scriptSrc = this.src;
 
+
                 // 如果脚本没有被加载过，则加载脚本
                 var isScriptLoaded = Array.prototype.some.call(document.scripts, function (script) {
                     return script.src === scriptSrc;

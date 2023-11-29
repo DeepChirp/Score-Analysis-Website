@@ -15,7 +15,6 @@ CREATE TABLE students (
     name VARCHAR(16) NOT NULL
 );
 
-
 CREATE TABLE exams (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL
@@ -37,3 +36,8 @@ CREATE TABLE grades (
     id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(64) NOT NULL
 );
+
+CREATE INDEX idx_student_id ON scores (student_id);
+CREATE INDEX idx_exam_id ON scores (exam_id);
+CREATE INDEX idx_class ON students (class);
+CREATE INDEX idx_student_id_exam_id ON scores (student_id, exam_id);
