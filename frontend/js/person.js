@@ -218,8 +218,8 @@ class PersonPage {
                             let lastGradeRank = this.examDetailByPerson[lastExamId][subjectId][2];
                             let deltaClassRank = lastClassRank - classRank;
                             let deltaGradeRank = lastGradeRank - gradeRank;
-                            classRankTd.innerHTML = `${classRank} <span style="color: ${deltaClassRank < 0 ? 'green' : 'red'}">(${deltaClassRank >= 0 ? '+' : ''}${deltaClassRank})</span>`;
-                            gradeRankTd.innerHTML = `${gradeRank} <span style="color: ${deltaGradeRank < 0 ? 'green' : 'red'}">(${deltaGradeRank >= 0 ? '+' : ''}${deltaGradeRank})</span>`;
+                            classRankTd.innerHTML = `${classRank} <span style="color: ${deltaClassRank < 0 ? 'red' : 'green'}">(${deltaClassRank >= 0 ? '+' : ''}${deltaClassRank})</span>`;
+                            gradeRankTd.innerHTML = `${gradeRank} <span style="color: ${deltaGradeRank < 0 ? 'red' : 'green'}">(${deltaGradeRank >= 0 ? '+' : ''}${deltaGradeRank})</span>`;
                         }
                         else {
                             classRankTd.textContent = classRank;
