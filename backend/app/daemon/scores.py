@@ -653,7 +653,8 @@ def get_exam_detail_by_person(student_id):
         cur.execute(sql, (exam_id, student_id, exam_id, class_id, student_id, student_id, exam_id))
         data = list(cur)
         if len(data) == 0 or data[0][0] is None:
-            ret = {"code": 404, "msg": "Not Found", "data": {}}
+            ret = {"code": 404, "msg": "Not Found for exam_id: {}".format(exam_id), "data": {}}
+            return ret
         else:
             temp = {}
             for subject_id, value, grade_rank, class_rank in data:
