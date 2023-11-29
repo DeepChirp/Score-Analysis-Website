@@ -68,7 +68,9 @@ for semester_name, semester_id in semester_to_id.items():
     cur.execute(semester_sql, (semester_name, class_divide))
 
 conn.commit()
-for filename in os.listdir("../data/csv"):
+filename_list = os.listdir("../data/csv")
+filename_list = sorted(filename_list, key=lambda x: int(x[:2]))
+for filename in filename_list:
     front, prefix = filename.split(".")
     if prefix == "csv":
         semester_name, exam_name = front[2:].split("_")
