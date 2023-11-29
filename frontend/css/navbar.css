@@ -21,7 +21,7 @@
 }
 
 .nav-item {
-    background-color: #f2f2f2;
+    background-color: #ffffff;
     margin-right: 0.625em;
     padding: 0.375em 0.75em;
     border-radius: 0.75em;
@@ -39,5 +39,5 @@
 }
 
 .nav-item:hover {
-    background-color: #ffffff;
+    background-color: #f2f2f2;
 }
