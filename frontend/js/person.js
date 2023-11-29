@@ -285,13 +285,13 @@ class PersonPage {
     }
 
     async getExamDetailByPerson(studentId) {
-            let data = await this.doGetExamDetailByPerson(studentId);
-            if (data["code"] === 200) {
-                this.examDetailByPerson = data["data"]["examDetails"];
-            } else {
-                // TODO: Show error message if request failed?
-            }
-        
+        let data = await this.doGetExamDetailByPerson(studentId);
+        if (data["code"] === 200) {
+            this.examDetailByPerson = data["data"]["examDetails"];
+        } else {
+            // TODO: Show error message if request failed?
+        }
+
     }
 
     drawChart(subjectId) {
@@ -300,7 +300,7 @@ class PersonPage {
             chartDiv.removeChild(chartDiv.firstChild);
         }
         let subjectName = subjectIdToName[subjectId];
-        
+
         let show = 0;
         const thisDiv = document.createElement("div");
         thisDiv.setAttribute("class", "subject-group-div");
@@ -329,7 +329,7 @@ class PersonPage {
                 gradeRanks.push(examDetail[subjectId][2]);
             }
 
-            }
+        }
 
 
         new Chart(scoreCanvas, {
@@ -360,6 +360,13 @@ class PersonPage {
                         fill: false
                     }
                 ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        reverse: true
+                    }
+                }
             }
         }
         );
@@ -368,8 +375,7 @@ class PersonPage {
         rankContainer.appendChild(rankCanvas);
         thisDiv.appendChild(scoreContainer);
         thisDiv.appendChild(rankContainer);
-        if (show)
-        {
+        if (show) {
             chartDiv.appendChild(thisDiv);
         }
     }
