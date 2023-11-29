@@ -252,7 +252,7 @@ class PersonPage {
         }
     }
     getLastValidExamId(examId) {
-        console.log(this.validExamList);
+
         if (this.validExamList.length > 0) {
             let temp = -1;
             for (const id of this.validExamList) {
@@ -275,14 +275,13 @@ class PersonPage {
     }
 
     async getExamDetailByPerson(studentId) {
-        if (Object.keys(this.examDetailByPerson).length == 0) {
             let data = await this.doGetExamDetailByPerson(studentId);
             if (data["code"] === 200) {
                 this.examDetailByPerson = data["data"]["examDetails"];
             } else {
                 // TODO: Show error message if request failed?
             }
-        }
+        
     }
 
     drawChart() {
@@ -377,9 +376,12 @@ class PersonPage {
 
         const submitButton = document.querySelector("#student-submit");
         submitButton.addEventListener("click", () => {
-            this.getExamDetailByPerson(this.studentNameToId[studentSelection.value]).then(() => {
-                this.updateStudentScoreTable(this.studentNameToId[studentSelection.value], examSelection.value);
-                this.drawChart();
+            this.updateValidExamList(this.studentNameToId[studentSelection.value]).then(() => {
+                console.log("Updated validExamList:" + this.validExamList);
+                this.getExamDetailByPerson(this.studentNameToId[studentSelection.value]).then(() => {
+                    this.updateStudentScoreTable(this.studentNameToId[studentSelection.value], examSelection.value);
+                    this.drawChart();
+                });
             });
         });
 
