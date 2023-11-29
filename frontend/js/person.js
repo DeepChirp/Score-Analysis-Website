@@ -7,6 +7,7 @@ class PersonPage {
         this.studentListByClassIdByExamId = {};
         this.studentNameToId = {};
         this.validExamList = [];
+        this.examDetailByPerson = {};
     }
     async doGetExamInfo() {
         let response = await fetch(`${protocolPrefix}${host}/api/scores/basic_info/exam`);
@@ -189,7 +190,6 @@ class PersonPage {
                 let scoresList = data["data"]["scores"];
                 let lastExamId = this.getLastValidExamId(examId);
 
-                // TODO: get rank from last exam
                 for (const [subjectId, subjectName] of Object.entries(subjectIdToName)) {
                     if (subjectId in scoresList) {
                         let score = scoresList[subjectId][0];
@@ -208,6 +208,16 @@ class PersonPage {
                         const gradeRankTd = document.createElement("td");
                         gradeRankTd.textContent = gradeRank;
                         thisTr.appendChild(gradeRankTd);
+                        const deltaClassRankTd = document.createElement("td");
+                        const deltaGradeRankTd = document.createElement("td");
+                        if (lastExamId != -1) {
+                            let lastClassRank = this.examDetailByPerson[lastExamId][subjectId][1];
+                            let lastGradeRank = this.examDetailByPerson[lastExamId][subjectId][2];
+                            deltaClassRankTd.textContent = lastClassRank - classRank;
+                            deltaGradeRankTd.textContent = lastGradeRank - gradeRank;
+                            thisTr.appendChild(deltaClassRankTd);
+                            thisTr.appendChild(deltaGradeRankTd);
+                        }
                         scoreTbody.appendChild(thisTr);
                     }
                 }
@@ -244,6 +254,25 @@ class PersonPage {
             return -1;
         }
     }
+
+    async doGetExamDetailByPerson(studentId) {
+        let response = await fetch(`${protocolPrefix}${host}/api/scores/data/by_person/${studentId}/exam_detail`);
+        let data = await response.json();
+        return data;
+    }
+    
+    async getExamDetailByPerson(studentId) {
+        if (Object.keys(this.examDetailByPerson).length == 0)
+        {
+            let data = await this.doGetExamDetailByPerson(studentId);
+            if (data["code"] === 200) {
+                this.examDetailByPerson = data["data"]["examDetails"];
+            } else {
+                // TODO: Show error message if request failed?
+            }
+        }
+    }
+
     initEventListeners() {
         this.getExamInfo();
         const studentSelection = document.querySelector("#student-selection");
@@ -256,7 +285,9 @@ class PersonPage {
 
         const submitButton = document.querySelector("#student-submit");
         submitButton.addEventListener("click", () => {
-            this.updateStudentScoreTable(this.studentNameToId[studentSelection.value], examSelection.value);
+            this.getExamDetailByPerson(this.studentNameToId[studentSelection.value]).then(() => {
+                this.updateStudentScoreTable(this.studentNameToId[studentSelection.value], examSelection.value);
+            });    
         });
 
         const gradeSelection = document.querySelector("#grade-selection");
