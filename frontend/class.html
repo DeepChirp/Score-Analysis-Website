@@ -13,6 +13,7 @@
     <script src="js/jquery-3.7.1.min.js" type="text/javascript" charset="UTF-8"></script> <!--引入jquery文件-->
     <script src="js/chart-4.4.0.min.js" type="text/javascript" charset="UTF-8"></script> <!--引入chart.js文件-->
     <script src="js/main.js" type="text/javascript" charset="UTF-8"></script> <!--引入js文件-->
+    <script src="js/class.js" type="text/javascript" charset="UTF-8" defer></script>
     <!--脚本标签结束-->
 </head>
 
@@ -36,6 +37,24 @@
                 <div class="title">
                     <h1>班级成绩分析</h1>
                 </div>
+            </div>
+            <div class="class-selection-div">
+                <label for="grade-selection">年级</label>
+                <select id="grade-selection">
+                    <option>Loading...</option>
+                </select>
+                <label for="exam-selection">考试</label>
+                <select id="exam-selection">
+                    <option>Loading...</option>
+                </select>
+                <label for="class-selection">班级</label>
+                <select id="class-selection">
+                    <option>Loading...</option>
+                </select>
+                <button id="class-submit">查询</button>
+            </div>
+            <div class="basic-info-div">
+                所选班级：<span id="class-id"></span> 本次考试有效人数：<span id="valid-num"></span>
             </div>
         </div>
     </div>

@@ -114,6 +114,11 @@ function bindNavbarButton() {
                         if (scriptSrc.endsWith('person.js')) {
                             window.isPersonJsLoadedFirstTime = true;
                         }
+
+                        // 如果是加载 class.js，设置一个全局标记
+                        if (scriptSrc.endsWith('class.js')) {
+                            window.isClassJsLoadedFirstTime = true;
+                        }
                     } else {
                         script.text = this.innerText;
                     }
@@ -121,6 +126,9 @@ function bindNavbarButton() {
                 } else if (scriptSrc.endsWith('person.js')) {
                     // 如果 person.js 已经被加载过，设置全局标记
                     window.isPersonJsLoadedFirstTime = false;
+                } else if (scriptSrc.endsWith('class.js')) {
+                    // 如果 class.js 已经被加载过，设置全局标记
+                    window.isClassJsLoadedFirstTime = false;
                 }
             });
 
@@ -129,6 +137,12 @@ function bindNavbarButton() {
                 console.log('Person.js already loaded, initializing PersonPage instance.');
                 window["personPage"] = new PersonPage();
                 window.personPage.initEventListeners();
+            }
+
+            if (url === 'class.html' && !window.isClassJsLoadedFirstTime) {
+                console.log('class.js already loaded, initializing ClassPage instance.');
+                window["classPage"] = new ClassPage();
+                window.classPage.initEventListeners();
             }
         });
     }
