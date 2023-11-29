@@ -312,9 +312,12 @@ class PersonPage {
             let scores = [];
             let gradeRanks = [];
             for (const [examId, examDetail] of Object.entries(this.examDetailByPerson)) {
-                labels.push(this.examIdToName[examId]);
-                scores.push(examDetail[subjectId][0]);
-                gradeRanks.push(examDetail[subjectId][2]);
+                if (subjectId in examDetail) {
+                    labels.push(this.examIdToName[examId]);
+                    scores.push(examDetail[subjectId][0]);
+                    gradeRanks.push(examDetail[subjectId][2]);
+                }
+                
             }
 
 
