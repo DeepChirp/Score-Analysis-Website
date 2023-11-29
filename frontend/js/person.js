@@ -293,6 +293,7 @@ class PersonPage {
             let show = 0;
             const thisDiv = document.createElement("div");
             thisDiv.setAttribute("class", "subject-group-div");
+            thisDiv.style.display = "flex";
             const scoreCanvas = document.createElement("canvas");
             const rankCanvas = document.createElement("canvas");
 
@@ -376,11 +377,15 @@ class PersonPage {
 
         const submitButton = document.querySelector("#student-submit");
         submitButton.addEventListener("click", () => {
+            submitButton.disabled = true;
+            submitButton.textContent = "Loading...";
             this.updateValidExamList(this.studentNameToId[studentSelection.value]).then(() => {
                 console.log("Updated validExamList:" + this.validExamList);
                 this.getExamDetailByPerson(this.studentNameToId[studentSelection.value]).then(() => {
                     this.updateStudentScoreTable(this.studentNameToId[studentSelection.value], examSelection.value);
                     this.drawChart();
+                    submitButton.disabled = false;
+                    submitButton.textContent = "查询";
                 });
             });
         });
