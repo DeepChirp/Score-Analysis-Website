@@ -390,40 +390,47 @@ class PersonPage {
             }
         });
 
+        const classSelection = document.querySelector("#class-selection");
+        classSelection.addEventListener("change", (event) => {
+            this.updateStudentList(event.target.value, examSelection.value);
+        });
+
         const submitButton = document.querySelector("#student-submit");
         submitButton.addEventListener("click", () => {
             submitButton.disabled = true;
             submitButton.textContent = "Loading...";
+            
             this.updateValidExamList(this.studentNameToId[studentSelection.value]).then(() => {
                 this.getExamDetailByPerson(this.studentNameToId[studentSelection.value]).then(() => {
                     this.updateStudentScoreTable(this.studentNameToId[studentSelection.value], examSelection.value);
                     this.drawChart(1);
                     submitButton.disabled = false;
                     submitButton.textContent = "查询";
+                    
                 });
             });
         });
 
         const gradeSelection = document.querySelector("#grade-selection");
         gradeSelection.addEventListener("change", (event) => {
-            studentSelection.value = "";
-            submitButton.disabled = true;
+            const classSelectionPreviousIndex = classSelection.selectedIndex;
             this.updateExamList(event.target.value);
+            classSelection.selectedIndex = classSelectionPreviousIndex;
+            
         });
 
         const examSelection = document.querySelector("#exam-selection");
         examSelection.addEventListener("change", (event) => {
-            studentSelection.value = "";
-            submitButton.disabled = true;
+            const classSelectionPreviousIndex = classSelection.selectedIndex;
             this.updateClassList(event.target.value);
+            setTimeout(() => {
+                classSelection.selectedIndex = classSelectionPreviousIndex;
+            }, 50);
+            
+            
         });
 
-        const classSelection = document.querySelector("#class-selection");
-        classSelection.addEventListener("change", (event) => {
-            studentSelection.value = "";
-            submitButton.disabled = true;
-            this.updateStudentList(event.target.value, examSelection.value);
-        });
+        
     }
 }
 
