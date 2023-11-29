@@ -214,6 +214,9 @@ class PersonPage {
                         const classRankTd = document.createElement("td");
                         const gradeRankTd = document.createElement("td");
                         if (lastExamId != -1) {
+                            console.log(this.examDetailByPerson);
+                            console.log(lastExamId);
+                            console.log(subjectId);
                             let lastClassRank = this.examDetailByPerson[lastExamId][subjectId][1];
                             let lastGradeRank = this.examDetailByPerson[lastExamId][subjectId][2];
                             let deltaClassRank = lastClassRank - classRank;
@@ -249,6 +252,7 @@ class PersonPage {
         }
     }
     getLastValidExamId(examId) {
+        console.log(this.validExamList);
         if (this.validExamList.length > 0) {
             let temp = -1;
             for (const id of this.validExamList) {
@@ -287,6 +291,7 @@ class PersonPage {
             chartDiv.removeChild(chartDiv.firstChild);
         }
         for (const [subjectId, subjectName] of Object.entries(subjectIdToName)) {
+            let show = 0;
             const thisDiv = document.createElement("div");
             thisDiv.setAttribute("class", "subject-group-div");
             const scoreCanvas = document.createElement("canvas");
@@ -307,6 +312,7 @@ class PersonPage {
             let gradeRanks = [];
             for (const [examId, examDetail] of Object.entries(this.examDetailByPerson)) {
                 if (subjectId in examDetail) {
+                    show = 1;
                     labels.push(this.examIdToName[examId]);
                     scores.push(examDetail[subjectId][0]);
                     gradeRanks.push(examDetail[subjectId][2]);
@@ -351,7 +357,11 @@ class PersonPage {
             rankContainer.appendChild(rankCanvas);
             thisDiv.appendChild(scoreContainer);
             thisDiv.appendChild(rankContainer);
-            chartDiv.appendChild(thisDiv);
+            if (show)
+            {
+                chartDiv.appendChild(thisDiv);
+            }
+            
         }
     }
 
