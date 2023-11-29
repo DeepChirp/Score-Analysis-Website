@@ -199,8 +199,21 @@ class PersonPage {
                 let scoresList = data["data"]["scores"];
                 let lastExamId = this.getLastValidExamId(examId);
 
+                const chartSelectDiv = document.querySelector("#student-score-chart-select-div");
+
+                while (chartSelectDiv.firstChild) {
+                    chartSelectDiv.removeChild(chartSelectDiv.firstChild);
+                }
+
                 for (const [subjectId, subjectName] of Object.entries(subjectIdToName)) {
                     if (subjectId in scoresList) {
+                        const thisBtn = document.createElement("button");
+                        thisBtn.textContent = subjectName;
+                        thisBtn.addEventListener("click", () => {
+                            this.drawChart(subjectId);
+                        });
+                        chartSelectDiv.appendChild(thisBtn);
+
                         let score = scoresList[subjectId][0];
                         let classRank = scoresList[subjectId][1];
                         let gradeRank = scoresList[subjectId][2];
@@ -214,9 +227,6 @@ class PersonPage {
                         const classRankTd = document.createElement("td");
                         const gradeRankTd = document.createElement("td");
                         if (lastExamId != -1) {
-                            console.log(this.examDetailByPerson);
-                            console.log(lastExamId);
-                            console.log(subjectId);
                             let lastClassRank = this.examDetailByPerson[lastExamId][subjectId][1];
                             let lastGradeRank = this.examDetailByPerson[lastExamId][subjectId][2];
                             let deltaClassRank = lastClassRank - classRank;
@@ -284,84 +294,83 @@ class PersonPage {
         
     }
 
-    drawChart() {
+    drawChart(subjectId) {
         const chartDiv = document.querySelector("#student-score-chart-div");
         while (chartDiv.firstChild) {
             chartDiv.removeChild(chartDiv.firstChild);
         }
-        for (const [subjectId, subjectName] of Object.entries(subjectIdToName)) {
-            let show = 0;
-            const thisDiv = document.createElement("div");
-            thisDiv.setAttribute("class", "subject-group-div");
-            thisDiv.style.display = "flex";
-            const scoreCanvas = document.createElement("canvas");
-            const rankCanvas = document.createElement("canvas");
+        let subjectName = subjectIdToName[subjectId];
+        
+        let show = 0;
+        const thisDiv = document.createElement("div");
+        thisDiv.setAttribute("class", "subject-group-div");
+        thisDiv.style.display = "flex";
+        const scoreCanvas = document.createElement("canvas");
+        const rankCanvas = document.createElement("canvas");
 
-            const scoreContainer = document.createElement("div");
-            scoreContainer.setAttribute("class", "chart-container");
-            scoreContainer.style.flex = 1;
-            const rankContainer = document.createElement("div");
-            rankContainer.setAttribute("class", "chart-container");
-            rankContainer.style.flex = 1;
-            const title = document.createElement("h3");
-            title.textContent = subjectName;
-            thisDiv.appendChild(title);
+        const scoreContainer = document.createElement("div");
+        scoreContainer.setAttribute("class", "chart-container");
+        scoreContainer.style.flex = 1;
+        const rankContainer = document.createElement("div");
+        rankContainer.setAttribute("class", "chart-container");
+        rankContainer.style.flex = 1;
+        const title = document.createElement("h3");
+        title.textContent = subjectName;
+        thisDiv.appendChild(title);
 
-            let labels = [];
-            let scores = [];
-            let gradeRanks = [];
-            for (const [examId, examDetail] of Object.entries(this.examDetailByPerson)) {
-                if (subjectId in examDetail) {
-                    show = 1;
-                    labels.push(this.examIdToName[examId]);
-                    scores.push(examDetail[subjectId][0]);
-                    gradeRanks.push(examDetail[subjectId][2]);
-                }
+        let labels = [];
+        let scores = [];
+        let gradeRanks = [];
+        for (const [examId, examDetail] of Object.entries(this.examDetailByPerson)) {
+            if (subjectId in examDetail) {
+                show = 1;
+                labels.push(this.examIdToName[examId]);
+                scores.push(examDetail[subjectId][0]);
+                gradeRanks.push(examDetail[subjectId][2]);
+            }
 
             }
 
 
-            new Chart(scoreCanvas, {
-                type: "line",
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: "分数",
-                            data: scores,
-                            borderColor: "#007bff",
-                            fill: false
-                        }
-                    ]
-                }
+        new Chart(scoreCanvas, {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: "分数",
+                        data: scores,
+                        borderColor: "#007bff",
+                        fill: false
+                    }
+                ]
             }
-            );
+        }
+        );
 
-            new Chart(rankCanvas, {
-                type: "line",
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: "年级排名",
-                            data: gradeRanks,
-                            borderColor: "#007bff",
-                            fill: false
-                        }
-                    ]
-                }
+        new Chart(rankCanvas, {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: "年级排名",
+                        data: gradeRanks,
+                        borderColor: "#007bff",
+                        fill: false
+                    }
+                ]
             }
-            );
+        }
+        );
 
-            scoreContainer.appendChild(scoreCanvas);
-            rankContainer.appendChild(rankCanvas);
-            thisDiv.appendChild(scoreContainer);
-            thisDiv.appendChild(rankContainer);
-            if (show)
-            {
-                chartDiv.appendChild(thisDiv);
-            }
-            
+        scoreContainer.appendChild(scoreCanvas);
+        rankContainer.appendChild(rankCanvas);
+        thisDiv.appendChild(scoreContainer);
+        thisDiv.appendChild(rankContainer);
+        if (show)
+        {
+            chartDiv.appendChild(thisDiv);
         }
     }
 
@@ -380,10 +389,9 @@ class PersonPage {
             submitButton.disabled = true;
             submitButton.textContent = "Loading...";
             this.updateValidExamList(this.studentNameToId[studentSelection.value]).then(() => {
-                console.log("Updated validExamList:" + this.validExamList);
                 this.getExamDetailByPerson(this.studentNameToId[studentSelection.value]).then(() => {
                     this.updateStudentScoreTable(this.studentNameToId[studentSelection.value], examSelection.value);
-                    this.drawChart();
+                    this.drawChart(1);
                     submitButton.disabled = false;
                     submitButton.textContent = "查询";
                 });
