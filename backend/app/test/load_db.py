@@ -42,30 +42,53 @@ semester_to_id ={
     "高三下": 6
 }
 
+# 创建科目名称和科目ID的字典
+subjects = {
+    "chinese": 1,
+    "math": 2,
+    "english": 3,
+    "physics": 4,
+    "chemistry": 5,
+    "biology": 6,
+    "politic": 7,
+    "history": 8,
+    "geography": 9
+}
+
+# 处理学生数据
+student_data = []
 with open("../data/old_student_class", "r") as f:
     old_student_class = json.loads(f.read())
-    class_sql = "INSERT INTO students (class, class_divide, grade_id, name) VALUES (?, 0, ?, ?)"
     for name, class_id in old_student_class.items():
-        cur.execute(class_sql, (class_id, grades_name_to_id["本高2023届"], name))
-
+        student_data.append((class_id, 0, grades_name_to_id["本高2023届"], name))
 
 with open("../data/new_student_class", "r") as f:
     new_student_class = json.loads(f.read())
-    class_sql = "INSERT INTO students (class, class_divide, grade_id, name) VALUES (?, 1, ?, ?)"
     for name, class_id in new_student_class.items():
-        cur.execute(class_sql, (class_id, grades_name_to_id["本高2023届"], name))
+        student_data.append((class_id, 1, grades_name_to_id["本高2023届"], name))
 
+# 批量插入学生数据
+student_sql = "INSERT INTO students (class, class_divide, grade_id, name) VALUES (?, ?, ?, ?)"
+cur.executemany(student_sql, student_data)
+
+# 处理科目数据
+subject_data = []
 for subject_name, subject_info in subjects_to_id.items():
-    subject_sql = "INSERT INTO subjects (full_score, name) VALUES (?, ?)"
-    cur.execute(subject_sql, (subject_info[1], subject_name))
+    subject_data.append((subject_info[1], subject_name))
 
+# 批量插入科目数据
+subject_sql = "INSERT INTO subjects (full_score, name) VALUES (?, ?)"
+cur.executemany(subject_sql, subject_data)
+
+# 处理学期数据
+semester_data = []
 for semester_name, semester_id in semester_to_id.items():
-    semester_sql = "INSERT INTO semesters (name, class_divide) VALUES (?, ?)"
-    if semester_id <= 4:
-        class_divide = 0
-    else:
-        class_divide = 1
-    cur.execute(semester_sql, (semester_name, class_divide))
+    class_divide = 0 if semester_id <= 4 else 1
+    semester_data.append((semester_name, class_divide))
+
+# 批量插入学期数据
+semester_sql = "INSERT INTO semesters (name, class_divide) VALUES (?, ?)"
+cur.executemany(semester_sql, semester_data)
 
 conn.commit()
 filename_list = os.listdir("../data/csv")
@@ -118,32 +141,11 @@ for filename in filename_list:
 
             print("{}_{}: {}".format(semester_name, exam_name, exam_id))
             semester_id = semester_to_id[semester_name]
-            if chinese.strip() != "/":
-                chinese_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(chinese_sql, (student_id, exam_id, 1, semester_id, float(chinese)))
-            if math.strip() != "/":
-                math_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(math_sql, (student_id, exam_id, 2, semester_id, float(math)))
-            if english.strip() != "/":
-                english_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(english_sql, (student_id, exam_id, 3, semester_id, float(english)))
-            if physics.strip() != "/":
-                physics_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(physics_sql, (student_id, exam_id, 4, semester_id, float(physics)))
-            if chemistry.strip() != "/":
-                chemistry_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(chemistry_sql, (student_id, exam_id, 5, semester_id, float(chemistry)))
-            if biology.strip() != "/":
-                biology_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(biology_sql, (student_id, exam_id, 6, semester_id, float(biology)))
-            if politic.strip() != "/":
-                politic_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(politic_sql, (student_id, exam_id, 7, semester_id, float(politic)))
-            if history.strip() != "/":
-                history_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(history_sql, (student_id, exam_id, 8, semester_id, float(history)))
-            if geography.strip() != "/":
-                geography_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(geography_sql, (student_id, exam_id, 9, semester_id, float(geography)))
+            # 遍历字典，对每个科目执行相同的操作
+            for subject_name, subject_id in subjects.items():
+                subject_score = locals()[subject_name]
+                if subject_score.strip() != "/":
+                    score_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                    cur.execute(score_sql, (student_id, exam_id, subject_id, semester_id, float(subject_score)))
 
 conn.commit()
