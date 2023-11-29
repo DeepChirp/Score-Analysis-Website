@@ -97,12 +97,12 @@ function bindNavbarButton() {
             // 加载新的脚本
             $data.filter('script').add($data.find('script')).each(function () {
                 var scriptSrc = this.src;
-
+                
                 // 如果脚本没有被加载过，则加载脚本
                 var isScriptLoaded = Array.prototype.some.call(document.scripts, function (script) {
                     return script.src === scriptSrc;
                 });
-
+                console.log(`Script src: ${scriptSrc}, ${isScriptLoaded ? 'loaded' : 'not loaded'}`);
                 if (!isScriptLoaded) {
                     var script = document.createElement('script');
                     if (scriptSrc) {
@@ -114,13 +114,15 @@ function bindNavbarButton() {
                     document.head.appendChild(script);
                 }
 
-                // 如果加载的是 person.html，初始化 PersonPage 实例
-                if (url === 'person.html') {
-                    console.log('Initializing PersonPage instance.');
-                    window["personPage"] = new PersonPage();
-                    window.personPage.initEventListeners();
-                }
+
             });
+
+            // 如果加载的是 person.html，初始化 PersonPage 实例
+            if (url === 'person.html') {
+                console.log('Initializing PersonPage instance.');
+                window["personPage"] = new PersonPage();
+                window.personPage.initEventListeners();
+            }
         });
     }
 }
