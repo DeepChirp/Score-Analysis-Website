@@ -1,11 +1,11 @@
-# Backend Daemon V0.3.0
+# Backend Daemon V0.7.0
 
-- Change API to V0.3.0
+- Change API to V0.7.0
 
-# API V0.6.0
+# API V0.7.0
 
-## V0.6.0改动
-- 新增：/data/by_person/<int:student_id>/exam/<int:exam_id>
+## V0.7.0改动
+- 新增：/data/by_person/<int:student_id>/exam_detail
 
 SubjectId与科目名称对照表：
 |SubjectId|SubjectName|
@@ -272,3 +272,23 @@ data：
 |Item|Value|Description|
 |  ----  | ----  | ---- |
 |exams|List，有效考试的id|-|
+
+### GET `/data/by_person/<int:student_id>/exam_detail`
+查询该学生的有效考试（参加全部科目的考试）
+Input:
+- <int:student_id>：欲查询的学生id
+
+Output:
+HTTP 状态码始终为200，应根据返回的JSON判断：
+
+ret:    
+|Item|Value|Description|
+|  ----  | ----  | ---- |
+|code|int，API状态码|若student_id不存在，或该学生没有一次考试，则为404；若查询成功，则为200|
+|msg|String，（错误）信息|-|
+|data|dict/Object，查询的数据|详见下|
+
+data：
+|Item|Value|Description|
+|  ----  | ----  | ---- |
+|examDetails|dict/Object，每个元素的键为考试id，值为ScoresBySubject|ScoresBySubject详见上|
