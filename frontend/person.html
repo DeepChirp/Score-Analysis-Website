@@ -61,8 +61,8 @@
                     <button id="student-submit" disabled>查询</button>
                 </div>
                 <div class="student-score-table-div">
-                    <table class="student-score-table" border="1" width=100% cellpadding="10">
-                        <caption><b>个人成绩</b><b class="student-score-table-note">注：排名升降中“-”代表退步</b></caption>
+                    <table class="student-score-table" border="1" width=100% cellpadding="10"rules="all">
+                        <caption><b>个人成绩</b></caption>
                         <thead>
                             <tr>
                                 <th>科目</th>
@@ -85,6 +85,14 @@
         </div>
     </div>
     <div id="footer"></div>
+    <script src="./jquery-3.6.0.js" type="text/javascript" charset="UTF-8"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("thead tr").css("background-color", "#adabab");
+            $("tbody tr:even").css("background-color", "white");
+            $("tbody tr:odd").css("background-color", "#adabab");
+        })
+    </script>
 </body>
 
 <!--主体标签结束-->
