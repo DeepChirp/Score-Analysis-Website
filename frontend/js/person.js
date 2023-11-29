@@ -30,7 +30,7 @@ class PersonPage {
             if (data["code"] === 200) {
                 this.examData = data["data"];
 
-                
+
                 this.examInfoBySemester = this.examData["exams"];
                 for (const [semesterId, examInfoListOfSemester] of Object.entries(this.examInfoBySemester)) {
                     if (examInfoListOfSemester.length > 0) {
@@ -212,27 +212,23 @@ class PersonPage {
                         scoreTd.textContent = score;
                         thisTr.appendChild(scoreTd);
                         const classRankTd = document.createElement("td");
-                        classRankTd.textContent = classRank;
-                        thisTr.appendChild(classRankTd);
                         const gradeRankTd = document.createElement("td");
-                        gradeRankTd.textContent = gradeRank;
-                        thisTr.appendChild(gradeRankTd);
-                        const deltaClassRankTd = document.createElement("td");
-                        const deltaGradeRankTd = document.createElement("td");
                         if (lastExamId != -1) {
                             let lastClassRank = this.examDetailByPerson[lastExamId][subjectId][1];
                             let lastGradeRank = this.examDetailByPerson[lastExamId][subjectId][2];
-                            deltaClassRankTd.textContent = lastClassRank - classRank;
-                            deltaGradeRankTd.textContent = lastGradeRank - gradeRank;
-                            thisTr.appendChild(deltaClassRankTd);
-                            thisTr.appendChild(deltaGradeRankTd);
+                            let deltaClassRank = lastClassRank - classRank;
+                            let deltaGradeRank = lastGradeRank - gradeRank;
+                            classRankTd.textContent = `${classRank} (${deltaClassRank >= 0 ? '+' : ''}${deltaClassRank})`;
+                            gradeRankTd.textContent = `${gradeRank} (${deltaGradeRank >= 0 ? '+' : ''}${deltaGradeRank})`;
+                            classRankTd.style.color = deltaClassRank < 0 ? 'red' : 'green';
+                            gradeRankTd.style.color = deltaGradeRank < 0 ? 'red' : 'green';
                         }
                         else {
-                            deltaClassRankTd.textContent = "-";
-                            deltaGradeRankTd.textContent = "-";
-                            thisTr.appendChild(deltaClassRankTd);
-                            thisTr.appendChild(deltaGradeRankTd);
+                            classRankTd.textContent = classRank;
+                            gradeRankTd.textContent = gradeRank;
                         }
+                        thisTr.appendChild(classRankTd);
+                        thisTr.appendChild(gradeRankTd);
                         scoreTbody.appendChild(thisTr);
                     }
                 }
@@ -275,7 +271,7 @@ class PersonPage {
         let data = await response.json();
         return data;
     }
-    
+
     async getExamDetailByPerson(studentId) {
         if (Object.keys(this.examDetailByPerson).length == 0)
         {
@@ -317,7 +313,7 @@ class PersonPage {
                     scores.push(examDetail[subjectId][0]);
                     gradeRanks.push(examDetail[subjectId][2]);
                 }
-                
+
             }
 
 
@@ -376,7 +372,7 @@ class PersonPage {
             this.getExamDetailByPerson(this.studentNameToId[studentSelection.value]).then(() => {
                 this.updateStudentScoreTable(this.studentNameToId[studentSelection.value], examSelection.value);
                 this.drawChart();
-            });    
+            });
         });
 
         const gradeSelection = document.querySelector("#grade-selection");
