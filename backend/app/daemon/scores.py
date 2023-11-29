@@ -610,3 +610,71 @@ def get_exam_by_person(student_id):
         result = [x[0] for x in data]
         ret = {"code": 200, "msg": "Ok.", "data": {"exams": result}}
     return ret
+
+@bp.route("data/by_person/<int:student_id>/exam_detail", methods=("GET",))
+def get_exam_detail_by_person(student_id):
+    db = get_db()
+    cur = db.cursor()
+    class_sql = "SELECT class FROM students WHERE id = ?"
+    cur.execute(class_sql, (student_id,))
+    data = list(cur)
+    if len(data) == 0 or data[0][0] is None:
+        ret = {"code": 404, "msg": "student_id Not Found", "data": {}}
+        return ret
+    class_id = data[0][0]
+
+    sql = "SELECT exam_id " \
+          "FROM scores " \
+          "INNER JOIN students " \
+          "ON scores.student_id = students.id " \
+          "WHERE student_id = ? " \
+          "GROUP BY exam_id " \
+          "HAVING COUNT(*) >= 6"
+    cur.execute(sql, (student_id,))
+    data = list(cur)
+    if len(data) == 0 or data[0][0] is None:
+        ret = {"code": 404, "msg": "Not Found.", "data": {}}
+        return ret
+    else:
+        valid_exam_list = [x[0] for x in data]
+
+    ret_result = {}
+
+    for exam_id in valid_exam_list:
+        sql = "SELECT scores.subject_id, scores.value, tr.rank AS grade_rank, cr.rank AS class_rank " \
+              "FROM scores " \
+              "INNER JOIN students " \
+              "ON scores.student_id = students.id " \
+              "INNER JOIN (SELECT * FROM (SELECT student_id, subject_id, value, RANK() OVER (PARTITION BY subject_id ORDER BY value DESC) AS rank FROM scores WHERE exam_id = ?) AS sub WHERE student_id = ?) AS tr " \
+              "ON scores.student_id = tr.student_id AND tr.subject_id = scores.subject_id " \
+              "INNER JOIN (SELECT * FROM (SELECT student_id, subject_id, value, RANK() OVER (PARTITION BY subject_id ORDER BY value DESC) AS rank FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = ? AND class = ?) AS sub WHERE student_id = ?) AS cr " \
+              "ON scores.student_id = cr.student_id AND cr.subject_id = scores.subject_id " \
+              "WHERE scores.student_id = ? AND exam_id = ?"
+        cur.execute(sql, (exam_id, student_id, exam_id, class_id, student_id, student_id, exam_id))
+        data = list(cur)
+        if len(data) == 0 or data[0][0] is None:
+            ret = {"code": 404, "msg": "Not Found", "data": {}}
+        else:
+            temp = {}
+            for subject_id, value, grade_rank, class_rank in data:
+                temp[subject_id] = [value, class_rank, grade_rank]
+            result = {}
+            for key, value in temp.items():
+                result[key] = value
+
+            total_sql = "SELECT temp.v, temp.rank " \
+                        "FROM(SELECT tvalue.student_id , v, RANK() OVER (ORDER BY tvalue.v DESC) AS rank FROM (SELECT student_id, SUM(value) AS v FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = ? GROUP BY name) AS tvalue) AS temp " \
+                        "WHERE temp.student_id = ?"
+            cur.execute(total_sql, (exam_id, student_id))
+            data = list(cur)
+            total_score, total_grade_rank = data[0]
+            class_rank_sql = "SELECT temp2.rank " \
+                             "FROM(SELECT tvalue.student_id , v, RANK() OVER (ORDER BY tvalue.v DESC) AS rank FROM (SELECT student_id, SUM(value) AS v FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = ? AND class = ? GROUP BY name) AS tvalue) AS temp2 " \
+                             "WHERE temp2.student_id = ?"
+            cur.execute(class_rank_sql, (exam_id, class_id, student_id))
+            data = list(cur)
+            total_class_rank = data[0][0]
+            result[255] = [total_score, total_class_rank, total_grade_rank]
+            ret_result[exam_id] = result
+    ret = {"code": 200, "msg": "Ok", "data": {"examDetails": ret_result}}
+    return ret
