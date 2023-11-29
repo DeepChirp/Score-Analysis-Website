@@ -114,6 +114,13 @@ function bindNavbarButton() {
                     }
                     document.head.appendChild(script);
                 }
+
+                // 如果加载的是 person.html，初始化 PersonPage 实例
+                if (url === 'person.html') {
+                    console.log('Initializing PersonPage instance.');
+                    window.personPage = new PersonPage();
+                    window.personPage.initEventListeners();
+                }
             });
         });
     }

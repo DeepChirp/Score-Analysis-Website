@@ -293,19 +293,3 @@ PersonPage.prototype.initEventListeners = function () {
         this.updateStudentList(event.target.value, examSelection.value);
     });
 }
-
-// 在页面加载完成时，创建 PersonPage 的实例
-$(document).ready(function () {
-    if (window.location.pathname === '/person.html') {
-        window.personPage = new PersonPage();
-        window.personPage.load();
-    }
-});
-
-// 在页面卸载时，卸载 PersonPage 的实例
-$(window).on('beforeunload', function () {
-    if (window.personPage) {
-        window.personPage.unload();
-        window.personPage = null;
-    }
-});
