@@ -1,6 +1,7 @@
 backend/app/.idea
 backend/app/venv
 .idea
+*.ods
 
 *.pyc
 __pycache__/
