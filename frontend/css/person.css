@@ -8,10 +8,14 @@
     width: 45%;
 }
 
-tr:nth-child(even) {
+thead tr {
     background-color: #adabab;
 }
 
-tr:nth-child(odd) {
+tbody tr:nth-child(even) {
+    background-color: #cfcfcf;
+}
+
+tbody tr:nth-child(odd) {
     background-color: #ffffff;
 }
