@@ -1,11 +1,11 @@
-# Backend Daemon V0.7.0
+# Backend Daemon V0.8.0
 
-- Change API to V0.7.0
+- Change API to V0.8.0
 
-# API V0.7.0
+# API V0.8.0
 
-## V0.7.0改动
-- 新增：/data/by_person/<int:student_id>/exam_detail
+## V0.8.0改动
+- 新增：/basic_info/subject_overall_data/exam/<int:exam_id>
 
 SubjectId与科目名称对照表：
 |SubjectId|SubjectName|
@@ -81,6 +81,46 @@ data:
 |Item|Value|Description|
 |  ----  | ----  | ---- |
 |classes|List，参考的班级|每个元素为一个参考的班级的id，保证按升序排列|
+
+
+### GET `/basic_info/subject_overall_data/exam/<int:exam_id>`
+Input:
+- <int:exam_id>：欲查询的考试的id
+
+Output:
+HTTP 状态码始终为200，应根据返回的JSON判断：
+ret:
+|Item|Value|Description|
+|  ----  | ----  | ---- |
+|code|int，API状态码|若exam_id不存在，则为404；若查询成功，则为200|
+|msg|String，（错误）信息|-|
+|data|dict/Object，查询的数据|详见下|
+
+data:
+|Item|Value|Description|
+|  ----  | ----  | ---- |
+|overallData|overallDataBySubject(Object/dict)|详见下|
+
+overallDataBySubject：
+|Item|Value|Description|
+|  ----  | ----  | ---- |
+|1|overallData(Object/dict)，语文学科的总体数据|详见下|
+|2|overallData(Object/dict)，数学学科的总体数据|详见下|
+|3|overallData(Object/dict)，外语学科的总体数据|详见下|
+|4|overallData(Object/dict)，物理学科的总体数据|详见下|
+|5|overallData(Object/dict)，化学学科的总体数据|详见下|
+|6|overallData(Object/dict)，生物学科的总体数据|详见下|
+|7|overallData(Object/dict)，政治学科的总体数据|详见下|
+|8|overallData(Object/dict)，历史学科的总体数据|详见下|
+|9|overallData(Object/dict)，地理学科的总体数据|详见下|
+|255|overallData(Object/dict)，总分的总体数据|详见下|
+
+overallData：
+|Item|Value|Description|
+|  ----  | ----  | ---- |
+|validNum|Int，全年级参加该科目考试的有效人数|-|
+|gradeAvgScore|Double，全年级该科目平均分|-|
+
 
 ### GET `/basic_info/by_class/<int:class_id>/exam/<int:exam_id>`
 Input:

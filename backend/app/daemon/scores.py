@@ -79,6 +79,35 @@ def get_basic_info_by_class(class_id, exam_id):
     return ret
 
 
+@bp.route("/basic_info/subject_overall_data/exam/<int:exam_id>", methods=("GET",))
+def get_exam_basic_data(exam_id):
+    # SELECT class, COUNT(student_id) FROM (SELECT DISTINCT student_id FROM scores WHERE exam_id = 46) AS t INNER JOIN students ON t.student_id = students.id GROUP BY students.class;
+    db = get_db()
+    cur = db.cursor()
+    sql = "SELECT COUNT(*), AVG(value) " \
+          "FROM scores " \
+          "WHERE exam_id = ? " \
+          "AND subject_id = ? " \
+          "AND student_id IN (SELECT student_id FROM scores WHERE exam_id = 44 GROUP BY student_id HAVING COUNT(*) >= 6)"
+    result_by_subject = {}
+    for subject_id in range(1, 10):
+        cur.execute(sql, (exam_id, subject_id))
+        data = list(cur)
+        if subject_id == 1 and (len(data) == 0 or data[0][0] == None):
+            ret = {"code": 404, "msg": "Not Found.", "data": {}}
+            return ret
+        if len(data) == 0 or data[0][0] == None:
+            continue
+        else:
+            result_by_subject[subject_id] = {"validNum": data[0][0], "gradeAvgScore": data[0][1]}
+    total_sql = "SELECT COUNT(*), AVG(tvalue) " \
+                "FROM(SELECT SUM(value) AS tvalue FROM scores WHERE exam_id = ? AND student_id IN (SELECT student_id FROM scores WHERE exam_id = ? GROUP BY student_id HAVING COUNT(*) >= 6) GROUP BY student_id) AS t"
+    cur.execute(total_sql, (exam_id, exam_id))
+    data = list(cur)
+    result_by_subject[255] = {"validNum": data[0][0], "gradeAvgScore": data[0][1]}
+    ret = {"code": 200, "msg": "Ok.", "data": {"overallData": result_by_subject}}
+    return ret
+
 @bp.route("/data/by_class/<int:class_id>/exam/<int:exam_id>", methods=("GET",))
 def get_data_by_class(class_id, exam_id):
     db = get_db()
