@@ -103,6 +103,16 @@ for filename in filename_list:
                 if len(data) != 0 and data[0][0] is not None:
                     student_id = data[0][0]
                     student_to_id[student_name] = student_id
+                else:
+                    isql = "INSERT INTO students (class, name, class_divide, grade_id) VALUES (?, ?, ?, ?)"
+                    if class_id.strip() == "":
+                        class_id = "17班"
+                    cur.execute(isql, (int(class_id[:-1]), student_name, 0, grade_id))
+                    conn.commit()
+                    id_sql = "SELECT id FROM students WHERE name = ?"
+                    cur.execute(id_sql, (student_name,))
+                    data = list(cur)
+                    student_id = data[0][0]
 
             exam_saved_name = "{}_{}".format(semester_name, exam_name)
             if exam_saved_name in exams_to_id:
@@ -116,7 +126,6 @@ for filename in filename_list:
                 exam_id = list(cur)[0][0]
                 exams_to_id[exam_saved_name] = exam_id
 
-            print("{}_{}: {}".format(semester_name, exam_name, exam_id))
             semester_id = semester_to_id[semester_name]
             if chinese.strip() != "/":
                 chinese_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
