@@ -1,11 +1,11 @@
-# Backend Daemon V0.8.0
+# Backend Daemon V0.9.0
 
 - Change API to V0.8.0
 
-# API V0.8.0
+# API V0.9.0
 
-## V0.8.0改动
-- 新增：/basic_info/subject_overall_data/exam/<int:exam_id>
+## V0.9.0改动
+- /basic_info/subject_overall_data/exam/<int:exam_id>新增gradeMaxScore.
 
 SubjectId与科目名称对照表：
 |SubjectId|SubjectName|
@@ -120,6 +120,7 @@ overallData：
 |  ----  | ----  | ---- |
 |validNum|Int，全年级参加该科目考试的有效人数|-|
 |gradeAvgScore|Double，全年级该科目平均分|-|
+|gradeMaxScore|Double，全年级该科目最高分|-|
 
 
 ### GET `/basic_info/by_class/<int:class_id>/exam/<int:exam_id>`
