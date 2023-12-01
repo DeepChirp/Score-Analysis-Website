@@ -42,6 +42,21 @@ semester_to_id ={
     "高三下": 6
 }
 
+
+cur.execute("TRUNCATE TABLE scores")
+cur.execute("TRUNCATE TABLE students")
+cur.execute("TRUNCATE TABLE exams")
+cur.execute("TRUNCATE TABLE subjects")
+cur.execute("TRUNCATE TABLE semesters")
+cur.execute("TRUNCATE TABLE grades")
+
+cur.execute("DROP INDEX idx_student_id ON scores")
+cur.execute("DROP INDEX idx_exam_id ON scores")
+cur.execute("DROP INDEX idx_class ON students")
+cur.execute("DROP INDEX idx_student_id_exam_id ON scores")
+
+conn.commit()
+
 with open("../data/old_student_class", "r") as f:
     old_student_class = json.loads(f.read())
     class_sql = "INSERT INTO students (class, class_divide, grade_id, name) VALUES (?, 0, ?, ?)"
@@ -155,4 +170,9 @@ for filename in filename_list:
                 geography_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
                 cur.execute(geography_sql, (student_id, exam_id, 9, semester_id, float(geography)))
 
+
+cur.execute("CREATE INDEX idx_student_id ON scores (student_id)")
+cur.execute("CREATE INDEX idx_exam_id ON scores (exam_id)")
+cur.execute("CREATE INDEX idx_class ON students (class)")
+cur.execute("CREATE INDEX idx_student_id_exam_id ON scores (student_id, exam_id)")
 conn.commit()
