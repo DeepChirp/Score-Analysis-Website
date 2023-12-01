@@ -1,0 +1,36 @@
+.basic-info-div {
+    display: none;
+}
+
+.class-analysis-table-note {
+    float: right;
+    font-size: 0.8em;
+}
+
+.total-chart-container {
+    display: flex;
+}
+
+.first-chart-container {
+    display: flex;
+}
+
+.last-chart-container {
+    display: flex;
+}
+
+.chart-container {
+    flex: 1 1;
+}
+
+thead tr {
+    background-color: #adabab;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #cfcfcf;
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}

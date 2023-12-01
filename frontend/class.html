@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!--移动端适配-->
     <link rel="icon" href="favicon.svg"> <!--图标-->
     <link rel="stylesheet" type="text/css" href="css/main.css"> <!--引入css文件-->
+    <link rel="stylesheet" type="text/css" href="css/class.css">
     <!--脚本标签开始-->
     <script src="js/jquery-3.7.1.min.js" type="text/javascript" charset="UTF-8"></script> <!--引入jquery文件-->
     <script src="js/chart-4.4.0.min.js" type="text/javascript" charset="UTF-8"></script> <!--引入chart.js文件-->
@@ -56,6 +57,33 @@
             <div class="basic-info-div">
                 所选班级：<span id="class-id"></span> 本次考试有效人数：<span id="valid-num"></span>
             </div>
+            <div class="analysis-table-div"></div>
+            <table class="analysis-table" border="1" width=100% cellpadding="10" rules="all">
+                <caption><b>班级成绩<br></b>
+                    <!--红色通常与警告或者危险相关联，而绿色与安全或者正面的变化相关联-->
+                    <b class="class-analysis-table-note">注：绿色标注表示班级平均分高于年级平均分。</b>
+                </caption>
+                <thead>
+                    <tr>
+                        <th>科目</th>
+                        <th>年级平均分</th>
+                        <th>年级最高分</th>
+                        <th>班级平均分</th>
+                        <th>班级平均分排名</th>
+                        <th>班级最高分</th>
+                        <th>班级最高分姓名</th>
+                        <th>班级前十平均分</th>
+                        <th>班级前十平均分排名</th>
+                        <th>班级后十平均分</th>
+                        <th>班级后十平均分排名</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+            <div class="subject-selection-div"></div>
+            <div class="subject-chart-div"></div>
         </div>
     </div>
     <div id="footer"></div>
