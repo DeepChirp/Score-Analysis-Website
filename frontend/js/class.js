@@ -1,5 +1,5 @@
 class ClassPage {
-    constructor () {
+    constructor() {
         this.examData = {};
         this.examIdToName = {};
         this.examInfoBySemester = {};
@@ -230,7 +230,7 @@ class ClassPage {
         }
         this.doGetClassAnalysisBySubject(classId, subjectId).then((data) => {
             if (data["code"] === 200) {
-                
+
                 const htitle = document.createElement("h3");
                 htitle.textContent = subjectIdToName[subjectId];
                 subjectChartDiv.appendChild(htitle);
@@ -257,7 +257,7 @@ class ClassPage {
                 classFirstTenAvgContainer.setAttribute("class", "chart-container");
                 const classFirstTenAvgCanvas = document.createElement("canvas");
                 classFirstTenAvgContainer.appendChild(classFirstTenAvgCanvas);
-                
+
                 const classFirstTenRankContainer = document.createElement("div");
                 classFirstTenRankContainer.setAttribute("class", "chart-container");
                 const classFirstTenRankCanvas = document.createElement("canvas");
@@ -272,7 +272,7 @@ class ClassPage {
                 classLastTenAvgContainer.setAttribute("class", "chart-container");
                 const classLastTenAvgCanvas = document.createElement("canvas");
                 classLastTenAvgContainer.appendChild(classLastTenAvgCanvas);
-                
+
                 const classLastTenRankContainer = document.createElement("div");
                 classLastTenRankContainer.setAttribute("class", "chart-container");
                 const classLastTenRankCanvas = document.createElement("canvas");
@@ -309,12 +309,11 @@ class ClassPage {
                     lastTenAvgLst.push(chartData["last10AvgScore"]);
                     lastTenAvgRankLst.push(chartData["last10AvgScoreRank"]);
                     lastTenStdLst.push(chartData["last10std"]);
-                    
+
                 }
 
                 let minScore = Math.min(...classAvgLst, ...gradeAvgLst) - 10;
-                if (minScore < 0) 
-                {
+                if (minScore < 0) {
                     minScore = 0;
                 }
                 let maxScore = subjectFullScore[subjectId];
@@ -336,7 +335,8 @@ class ClassPage {
                                 label: "年级平均分",
                                 data: gradeAvgLst,
                                 borderColor: "#bea925",
-                                fill: false
+                                fill: false,
+                                borderDash: [5, 5] // Make this line dashed
                             }
                         ]
                     },
@@ -348,7 +348,7 @@ class ClassPage {
                             }
                         }
                     }
-                    
+
                 }
                 );
 
@@ -364,6 +364,13 @@ class ClassPage {
                                 fill: false
                             }
                         ]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                reverse: true
+                            }
+                        }
                     }
                 }
                 );
@@ -404,10 +411,18 @@ class ClassPage {
                                 fill: false
                             }
                         ]
+
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                reverse: true
+                            }
+                        }
                     }
                 }
                 );
-                
+
                 new Chart(classLastTenAvgCanvas, {
                     type: "line",
                     data: {
@@ -444,6 +459,13 @@ class ClassPage {
                                 fill: false
                             }
                         ]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                reverse: true
+                            }
+                        }
                     }
                 }
                 );
@@ -519,7 +541,7 @@ class ClassPage {
         } else {
             // TODO: Show error message if request failed?
         }
-        
+
     }
 
     initEventListeners() {
@@ -532,7 +554,7 @@ class ClassPage {
             const classSelectionPreviousIndex = classSelection.selectedIndex;
             this.updateExamList(event.target.value);
             classSelection.selectedIndex = classSelectionPreviousIndex;
-            
+
         });
 
         const examSelection = document.querySelector("#exam-selection");
@@ -541,7 +563,7 @@ class ClassPage {
             this.updateClassList(event.target.value);
             setTimeout(() => {
                 classSelection.selectedIndex = classSelectionPreviousIndex;
-            }, 50);   
+            }, 50);
         });
 
         const submitButton = document.querySelector("#class-submit");
@@ -555,7 +577,7 @@ class ClassPage {
                     submitButton.textContent = "查询";
                 });
             });
-            
+
         });
     }
 }
