@@ -20,6 +20,20 @@ const subjectIdToName = {
     255: "总分"
 };
 
+const subjectFullScore = {
+    1: 150,
+    2: 150,
+    3: 150,
+    4: 100,
+    5: 100,
+    6: 100,
+    7: 100,
+    8: 100,
+    9: 100,
+    255: 750
+};
+
+
 // 顶端导航栏和底部页脚的加载
 let navbarHtml = null;
 let footerHtml = null;
