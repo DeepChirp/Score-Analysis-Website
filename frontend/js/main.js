@@ -94,6 +94,26 @@ function bindNavbarButton() {
             var title = $data.filter('title').text();
             $('head title').text(title);
 
+            // 从加载的内容中提取 <link> 元素
+            $data.filter('link[rel="stylesheet"]').add($data.find('link[rel="stylesheet"]')).each(function () {
+                var cssHref = this.href;
+
+                // 检查CSS文件是否已经被加载过
+                var isCssLoaded = Array.prototype.some.call(document.styleSheets, function (styleSheet) {
+                    return styleSheet.href === cssHref;
+                });
+
+                if (!isCssLoaded) {
+                    // 创建一个新的 <link> 元素并设置其 href 属性为CSS文件的URL
+                    var link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = cssHref;
+
+                    // 将新的 <link> 元素添加到 <head> 元素中
+                    document.head.appendChild(link);
+                }
+            });
+
             // 加载新的脚本
             $data.filter('script').add($data.find('script')).each(function () {
                 var scriptSrc = this.src;
