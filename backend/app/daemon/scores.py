@@ -156,131 +156,144 @@ def get_grade_total_rank(cur, exam_id, target_score):
 def get_chart_data_by_subject(subject_id, class_id):
     db = get_db()
     cur = db.cursor()
-    class_avg_sql = "SELECT exam_id, AVG(value) " \
-                    "FROM scores " \
-                    "INNER JOIN students " \
-                    "ON students.id = scores.student_id " \
-                    "WHERE subject_id = ? " \
-                    "AND class = ? " \
-                    "GROUP BY exam_id"
-    cur.execute(class_avg_sql, (subject_id, class_id))
-    data = list(cur)
-    if len(data) == 0 or data[0][0] is None:
-        ret = {"code": 404, "msg": "Not Found.", "data": {}}
-        return ret
-
     class_data = {}
-    for exam_id, avg_score in data:
-        class_data[exam_id] = {
-            "avgScore": avg_score,
-            "avgScoreRank": get_grade_rank(cur, subject_id, exam_id, avg_score)
-        }
-
-    for exam_id in class_data.keys():
-        class_data_sql = "SELECT value " \
-                         "FROM scores " \
-                         "INNER JOIN students " \
-                         "ON scores.student_id = students.id " \
-                         "WHERE exam_id = ? " \
-                         "AND subject_id = ? " \
-                         "AND class = ?"
-        cur.execute(class_data_sql, (exam_id, subject_id, class_id))
+    if subject_id != 255:
+        class_avg_sql = "SELECT exam_id, AVG(value) " \
+                        "FROM scores " \
+                        "INNER JOIN students " \
+                        "ON students.id = scores.student_id " \
+                        "WHERE subject_id = ? " \
+                        "AND class = ? " \
+                        "GROUP BY exam_id"
+        cur.execute(class_avg_sql, (subject_id, class_id))
         data = list(cur)
-        score_lst = [x[0] for x in data]
-        class_data[exam_id]["std"] = numpy.std(score_lst)
+        if len(data) == 0 or data[0][0] is None:
+            ret = {"code": 404, "msg": "Not Found.", "data": {}}
+            return ret
+        for exam_id, avg_score in data:
+            class_data[exam_id] = {
+                "avgScore": avg_score,
+                "avgScoreRank": get_grade_rank(cur, subject_id, exam_id, avg_score)
+            }
 
-    for exam_id in class_data.keys():
-        first10_data_sql = "SELECT value " \
-                           "FROM scores " \
-                           "INNER JOIN students " \
-                           "ON students.id = scores.student_id " \
-                           "WHERE exam_id = ? " \
-                           "AND subject_id = ? " \
-                           "AND class = ? " \
-                           "ORDER BY value DESC " \
-                           "LIMIT 10"
-        cur.execute(first10_data_sql, (exam_id, subject_id, class_id))
-        score_lst = [x[0] for x in list(cur)]
-        class_data[exam_id]["first10AvgScore"] = numpy.average(score_lst)
-        class_data[exam_id]["first10AvgScoreRank"] = get_grade_rank(cur, subject_id, exam_id,
-                                                                    class_data[exam_id]["first10AvgScore"])
-        class_data[exam_id]["first10std"] = numpy.std(score_lst)
+        for exam_id in class_data.keys():
+            class_data_sql = "SELECT value " \
+                             "FROM scores " \
+                             "INNER JOIN students " \
+                             "ON scores.student_id = students.id " \
+                             "WHERE exam_id = ? " \
+                             "AND subject_id = ? " \
+                             "AND class = ?"
+            cur.execute(class_data_sql, (exam_id, subject_id, class_id))
+            data = list(cur)
+            score_lst = [x[0] for x in data]
+            class_data[exam_id]["std"] = numpy.std(score_lst)
 
-    for exam_id in class_data.keys():
-        last10_data_sql = "SELECT value " \
-                           "FROM scores " \
-                           "INNER JOIN students " \
-                           "ON students.id = scores.student_id " \
-                           "WHERE exam_id = ? " \
-                           "AND subject_id = ? " \
-                           "AND class = ? " \
-                           "ORDER BY value " \
-                           "LIMIT 10"
-        cur.execute(last10_data_sql, (exam_id, subject_id, class_id))
-        score_lst = [x[0] for x in list(cur)]
-        class_data[exam_id]["last10AvgScore"] = numpy.average(score_lst)
-        class_data[exam_id]["last10AvgScoreRank"] = get_grade_rank(cur, subject_id, exam_id,
-                                                                   class_data[exam_id]["last10AvgScore"])
-        class_data[exam_id]["last10std"] = numpy.std(score_lst)
-
-    grade_avg_score_sql = "SELECT exam_id, AVG(value) " \
-                          "FROM scores " \
-                          "WHERE subject_id = ? " \
-                          "GROUP BY exam_id"
-    cur.execute(grade_avg_score_sql, (subject_id,))
-    data = list(cur)
-    for exam_id, avg_score in data:
-        class_data[exam_id]["gradeAvgScore"] = avg_score
-    exam_lst = list(class_data.keys())
-    for exam_id in exam_lst:
-        class_total_data_sql = "SELECT SUM(value) " \
+        for exam_id in class_data.keys():
+            first10_data_sql = "SELECT value " \
                                "FROM scores " \
                                "INNER JOIN students " \
-                               "ON scores.student_id = students.id " \
+                               "ON students.id = scores.student_id " \
                                "WHERE exam_id = ? " \
+                               "AND subject_id = ? " \
                                "AND class = ? " \
-                               "GROUP BY student_id"
-        cur.execute(class_total_data_sql, (exam_id, class_id))
+                               "ORDER BY value DESC " \
+                               "LIMIT 10"
+            cur.execute(first10_data_sql, (exam_id, subject_id, class_id))
+            score_lst = [x[0] for x in list(cur)]
+            class_data[exam_id]["first10AvgScore"] = numpy.average(score_lst)
+            class_data[exam_id]["first10AvgScoreRank"] = get_grade_rank(cur, subject_id, exam_id,
+                                                                        class_data[exam_id]["first10AvgScore"])
+            class_data[exam_id]["first10std"] = numpy.std(score_lst)
+
+        for exam_id in class_data.keys():
+            last10_data_sql = "SELECT value " \
+                               "FROM scores " \
+                               "INNER JOIN students " \
+                               "ON students.id = scores.student_id " \
+                               "WHERE exam_id = ? " \
+                               "AND subject_id = ? " \
+                               "AND class = ? " \
+                              "AND student_id IN (SELECT student_id FROM scores WHERE exam_id = ? GROUP BY student_id HAVING COUNT(id) >= 6) " \
+                               "ORDER BY value " \
+                               "LIMIT 10"
+            cur.execute(last10_data_sql, (exam_id, subject_id, class_id, exam_id))
+            score_lst = [x[0] for x in list(cur)]
+            class_data[exam_id]["last10AvgScore"] = numpy.average(score_lst)
+            class_data[exam_id]["last10AvgScoreRank"] = get_grade_rank(cur, subject_id, exam_id,
+                                                                       class_data[exam_id]["last10AvgScore"])
+            class_data[exam_id]["last10std"] = numpy.std(score_lst)
+
+        grade_avg_score_sql = "SELECT exam_id, AVG(value) " \
+                              "FROM scores " \
+                              "WHERE subject_id = ? " \
+                              "GROUP BY exam_id"
+        cur.execute(grade_avg_score_sql, (subject_id,))
         data = list(cur)
-        score_lst = [x[0] for x in data]
-        class_data[255] = {}
-        class_data[255]["avgScore"] = numpy.average(score_lst)
-        class_data[255]["avgScoreRank"] = get_grade_total_rank(cur, exam_id, class_data[255]["avgScore"])
-        class_data[255]["std"] = numpy.std(score_lst)
-        class_total_first10_data_sql = "SELECT SUM(value) " \
-                                       "FROM scores " \
-                                       "INNER JOIN students " \
-                                       "ON scores.student_id = students.id " \
-                                       "WHERE exam_id = ? " \
-                                       "AND class = ? " \
-                                       "GROUP BY student_id " \
-                                       "ORDER BY SUM(value) DESC " \
-                                       "LIMIT 10"
-        cur.execute(class_total_first10_data_sql, (exam_id, class_id))
-        score_lst = [x[0] for x in list(cur)]
-        class_data[255]["first10AvgScore"] = numpy.average(score_lst)
-        class_data[255]["first10AvgScoreRank"] = get_grade_total_rank(cur, exam_id, class_data[255]["first10AvgScore"])
-        class_data[255]["first10std"] = numpy.std(score_lst)
+        for exam_id, avg_score in data:
+            class_data[exam_id]["gradeAvgScore"] = avg_score
 
-        class_total_last10_data_sql = "SELECT SUM(value) " \
-                                      "FROM scores " \
-                                      "INNER JOIN students " \
-                                      "ON scores.student_id = students.id " \
-                                      "WHERE exam_id = ? " \
-                                      "AND class = ? " \
-                                      "GROUP BY student_id " \
-                                      "ORDER BY SUM(value) " \
-                                      "LIMIT 10"
-        cur.execute(class_total_last10_data_sql, (exam_id, class_id))
-        score_lst = [x[0] for x in list(cur)]
-        class_data[255]["last10AvgScore"] = numpy.average(score_lst)
-        class_data[255]["last10AvgScoreRank"] = get_grade_total_rank(cur, exam_id, class_data[255]["last10AvgScore"])
-        class_data[255]["last10std"] = numpy.std(score_lst)
+    else:
+        exam_lst_sql = "SELECT DISTINCT exam_id " \
+                       "FROM scores " \
+                       "INNER JOIN students " \
+                       "ON students.id = scores.student_id " \
+                       "WHERE class = ?"
+        cur.execute(exam_lst_sql, (class_id,))
+        exam_lst = [x[0] for x in list(cur)]
+        for exam_id in exam_lst:
+            class_total_data_sql = "SELECT SUM(value) " \
+                                   "FROM scores " \
+                                   "INNER JOIN students " \
+                                   "ON scores.student_id = students.id " \
+                                   "WHERE exam_id = ? " \
+                                   "AND class = ? " \
+                                   "GROUP BY student_id"
+            cur.execute(class_total_data_sql, (exam_id, class_id))
+            data = list(cur)
+            if len(data) == 0 or data[0][0] is None:
+                ret = {"code": 404, "msg": "Not Found.", "data": {}}
+                return ret
+            score_lst = [x[0] for x in data]
+            class_data[exam_id] = {}
+            class_data[exam_id]["avgScore"] = numpy.average(score_lst)
+            class_data[exam_id]["avgScoreRank"] = get_grade_total_rank(cur, exam_id, class_data[exam_id]["avgScore"])
+            class_data[exam_id]["std"] = numpy.std(score_lst)
+            class_total_first10_data_sql = "SELECT SUM(value) " \
+                                           "FROM scores " \
+                                           "INNER JOIN students " \
+                                           "ON scores.student_id = students.id " \
+                                           "WHERE exam_id = ? " \
+                                           "AND class = ? " \
+                                           "GROUP BY student_id " \
+                                           "ORDER BY SUM(value) DESC " \
+                                           "LIMIT 10"
+            cur.execute(class_total_first10_data_sql, (exam_id, class_id))
+            score_lst = [x[0] for x in list(cur)]
+            class_data[exam_id]["first10AvgScore"] = numpy.average(score_lst)
+            class_data[exam_id]["first10AvgScoreRank"] = get_grade_total_rank(cur, exam_id, class_data[exam_id]["first10AvgScore"])
+            class_data[exam_id]["first10std"] = numpy.std(score_lst)
 
-        grade_total_avg_sql = "SELECT AVG(tvalue) " \
-                              "FROM(SELECT SUM(value) AS tvalue FROM scores WHERE exam_id = ? AND student_id IN (SELECT student_id FROM scores WHERE exam_id = ? GROUP BY student_id HAVING COUNT(id) >= 6) GROUP BY student_id) AS t"
-        cur.execute(grade_total_avg_sql, (exam_id, exam_id))
-        class_data[255]["gradeAvgScore"] = list(cur)[0][0]
+            class_total_last10_data_sql = "SELECT SUM(value) " \
+                                          "FROM scores " \
+                                          "INNER JOIN students " \
+                                          "ON scores.student_id = students.id " \
+                                          "WHERE exam_id = ? " \
+                                          "AND class = ? " \
+                                          "AND student_id IN (SELECT student_id FROM scores WHERE exam_id = ? GROUP BY student_id HAVING COUNT(id) >= 6) " \
+                                          "GROUP BY student_id " \
+                                          "ORDER BY SUM(value) " \
+                                          "LIMIT 10"
+            cur.execute(class_total_last10_data_sql, (exam_id, class_id, exam_id))
+            score_lst = [x[0] for x in list(cur)]
+            class_data[exam_id]["last10AvgScore"] = numpy.average(score_lst)
+            class_data[exam_id]["last10AvgScoreRank"] = get_grade_total_rank(cur, exam_id, class_data[exam_id]["last10AvgScore"])
+            class_data[exam_id]["last10std"] = numpy.std(score_lst)
+
+            grade_total_avg_sql = "SELECT AVG(tvalue) " \
+                                  "FROM(SELECT SUM(value) AS tvalue FROM scores WHERE exam_id = ? AND student_id IN (SELECT student_id FROM scores WHERE exam_id = ? GROUP BY student_id HAVING COUNT(id) >= 6) GROUP BY student_id) AS t"
+            cur.execute(grade_total_avg_sql, (exam_id, exam_id))
+            class_data[exam_id]["gradeAvgScore"] = list(cur)[0][0]
 
     ret = {"code": 200, "msg": "Ok.", "data": {"chartData": class_data}}
     return ret

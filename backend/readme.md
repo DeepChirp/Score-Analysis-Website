@@ -1,6 +1,6 @@
-# Backend Daemon V0.10.0
+# Backend Daemon V0.10.1
 
-- Change API to V0.10.0
+- Fix bug in /data/chart_data where total score analysis was mistakenly placed into examId.
 
 # API V0.10.0
 
