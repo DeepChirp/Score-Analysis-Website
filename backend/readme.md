@@ -1,11 +1,11 @@
-# Backend Daemon V0.9.0
+# Backend Daemon V0.10.0
 
-- Change API to V0.8.0
+- Change API to V0.10.0
 
-# API V0.9.0
+# API V0.10.0
 
-## V0.9.0改动
-- /basic_info/subject_overall_data/exam/<int:exam_id>新增gradeMaxScore.
+## V0.10.0改动
+- 新增：/data/chart_data/by_subject/<int:subject_id>/by_class/<int:class_id>
 
 SubjectId与科目名称对照表：
 |SubjectId|SubjectName|
@@ -141,6 +141,49 @@ data:
 |Item|Value|Description|
 |  ----  | ----  | ---- |
 |validNum|int，本次考试有效人数|有效人数指参加了全部科目考试的人数|
+
+### GET `/data/chart_data/by_subject/<int:subject_id>/by_class/<int:class_id>`
+
+Input:
+- <int:exam_id>：欲查询的科目id
+- <int:class_id>：欲求班级
+
+Output:
+HTTP 状态码始终为200，应根据返回的JSON判断：
+
+ret:
+|Item|Value|Description|
+|  ----  | ----  | ---- |
+|code|int，API状态码|若exam_id不存在，或class_id不存在，则为404；若查询成功，则为200|
+|msg|String，（错误）信息|-|
+|data|dict/Object，查询的数据|详见下|
+
+data：
+|Item|Value|Description|
+|  ----  | ----  | ---- |
+|chartData|ChartDataBySubject(Object/dict)，查询的科目成绩数据|详见下|
+
+ChartDataBySubject：
+|Item|Value|Description|
+|  ----  | ----  | ---- |
+|1|ChartData(Object/dict)，查询的科目对应考试的成绩数据|详见下|
+|2|ChartData(Object/dict)，查询的科目对应考试的成绩数据|详见下|
+|3|ChartData(Object/dict)，查询的科目对应考试的成绩数据|详见下|
+|...(examId)...|ChartData(Object/dict)，查询的科目对应考试的成绩数据|详见下|
+
+ChartData：
+|Item|Value|Description|
+|  ----  | ----  | ---- |
+|gradeAvgScore|Double，全年级平均分|-|
+|avgScore|Double，全班平均分|-|
+|avgScoreRank|Int，全班平均分的年级排名|-|
+|std|Double，该科目全班平均分的标准差|-|
+|first10AvgScore|Double，该科目班级前十平均分|-|
+|first10AvgScoreRank|Int，该科目班级前十平均分的年级排名|-|
+|first10std|Double，该科目班级前十平均分的标准差|-|
+|last10AvgScore|Double，该科目班级后十平均分|-|
+|last10AvgScoreRank|Int，该科目班级后十平均分的年级排名|-|
+|last10std|Double，该科目班级后十平均分的标准差|-|
 
 ### GET `/data/by_class/<int:class_id>/exam/<int:exam_id>`
 Input:
