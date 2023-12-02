@@ -139,7 +139,7 @@ function loadPageContent(url) {
 
         // 设置导航栏按钮的激活状态
         var pageName = document.body.id;
-        console.log('Loading page: ' + pageName);
+        console.log('Loading page: ' + pageName + '.html');
         if (pageName !== 'index') {
             var navButton = document.querySelector('.navbar-button[href="' + pageName + '.html"]');
             navButton.classList.add('active');

@@ -1,5 +1,5 @@
 footer {
-    background-color: #f8f9fa;
+    background-color: #404145;
     padding: 20px 0;
     text-align: center;
     border-top: 1px solid #e9ecef;
@@ -8,6 +8,6 @@ footer {
 .footer-content p {
     margin: 0;
     padding: 0;
-    color: #6c757d;
+    color: #bbb;
     text-align: center;
 }

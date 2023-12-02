@@ -24,3 +24,45 @@ tbody tr:nth-child(even) {
 tbody tr:nth-child(odd) {
     background-color: #ffffff;
 }
+
+#student-score-chart-container {
+    display: none;
+    margin-top: 5em;
+    margin-bottom: 5em;
+    border: 1px solid black;
+    border-radius: 0.5em;
+    background-color: #ffffff;
+}
+
+#student-score-chart-title {
+    color: #262729;
+    font-size: 1.25em;
+    font-weight: 700;
+    text-align: left;
+    letter-spacing: 0.0625em;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    margin: 1em;
+}
+
+#student-score-chart-select-div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2em;
+}
+
+.subject-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    font-size: 1.5em;
+}
+
+.subject-button.selected {
+    font-weight: bold;
+    border-bottom: 2px solid blue;
+}

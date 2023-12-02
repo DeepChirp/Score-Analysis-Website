@@ -201,6 +201,9 @@ class PersonPage {
 
                 const chartSelectDiv = document.querySelector("#student-score-chart-select-div");
 
+                // Show the chart select div
+                document.getElementById('student-score-chart-container').style.display = 'block';
+
                 while (chartSelectDiv.firstChild) {
                     chartSelectDiv.removeChild(chartSelectDiv.firstChild);
                 }
@@ -209,6 +212,7 @@ class PersonPage {
                     if (subjectId in scoresList) {
                         const thisBtn = document.createElement("button");
                         thisBtn.textContent = subjectName;
+                        thisBtn.classList.add("subject-button");
                         thisBtn.addEventListener("click", () => {
                             this.drawChart(subjectId);
                         });
@@ -243,6 +247,17 @@ class PersonPage {
                         scoreTbody.appendChild(thisTr);
                     }
                 }
+
+                // Add selected class to the selected button
+                var buttons = document.querySelectorAll('.subject-button');
+                buttons.forEach(function (button) {
+                    button.addEventListener('click', function () {
+                        buttons.forEach(function (btn) {
+                            btn.classList.remove('selected');
+                        });
+                        button.classList.add('selected');
+                    });
+                });
             } else {
                 // TODO: Show error message if request failed?
             }
@@ -314,9 +329,6 @@ class PersonPage {
         const rankContainer = document.createElement("div");
         rankContainer.setAttribute("class", "chart-container");
         rankContainer.style.flex = 1;
-        const title = document.createElement("h3");
-        title.textContent = subjectName;
-        thisDiv.appendChild(title);
 
         let labels = [];
         let scores = [];
@@ -399,14 +411,13 @@ class PersonPage {
         submitButton.addEventListener("click", () => {
             submitButton.disabled = true;
             submitButton.textContent = "Loading...";
-            
+
             this.updateValidExamList(this.studentNameToId[studentSelection.value]).then(() => {
                 this.getExamDetailByPerson(this.studentNameToId[studentSelection.value]).then(() => {
                     this.updateStudentScoreTable(this.studentNameToId[studentSelection.value], examSelection.value);
                     this.drawChart(1);
                     submitButton.disabled = false;
                     submitButton.textContent = "查询";
-                    
                 });
             });
         });
@@ -416,7 +427,7 @@ class PersonPage {
             const classSelectionPreviousIndex = classSelection.selectedIndex;
             this.updateExamList(event.target.value);
             classSelection.selectedIndex = classSelectionPreviousIndex;
-            
+
         });
 
         const examSelection = document.querySelector("#exam-selection");
@@ -426,11 +437,11 @@ class PersonPage {
             setTimeout(() => {
                 classSelection.selectedIndex = classSelectionPreviousIndex;
             }, 50);
-            
-            
+
+
         });
 
-        
+
     }
 }
 
