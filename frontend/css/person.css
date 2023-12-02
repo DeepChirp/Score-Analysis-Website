@@ -34,7 +34,7 @@ tbody tr:nth-child(odd) {
     background-color: #ffffff;
 }
 
-#student-score-chart-title {
+#chart-container-title {
     color: #262729;
     font-size: 1.25em;
     font-weight: 700;
@@ -59,7 +59,7 @@ tbody tr:nth-child(odd) {
     border: none;
     cursor: pointer;
     text-align: center;
-    font-size: 1.5em;
+    font-size: 1em;
 }
 
 .subject-button.selected {
