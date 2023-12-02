@@ -795,6 +795,14 @@ def get_data_by_person(student_id, exam_id):
     cur.execute(class_sql, (class_id, exam_id))
     class_data = list(cur)
 
+    grade_sql = "SELECT subject_id, MAX(value), AVG(value) " \
+                "FROM scores " \
+                "INNER JOIN students " \
+                "ON students.id = scores.student_id " \
+                "WHERE exam_id = ? " \
+                "GROUP BY subject_id"
+    cur.execute(grade_sql, (exam_id,))
+    grade_data = list(cur)
 
     if len(data) == 0 or data[0][0] is None:
         ret = {"code": 404, "msg": "Not Found", "data": {}}
@@ -818,6 +826,21 @@ def get_data_by_person(student_id, exam_id):
                                   "AND subject_id = ? " \
                                   "AND exam_id = ?"
                 cur.execute(total_count_sql, (class_id, subject_id, exam_id))
+                data = list(cur)
+                result[subject_id].append(data[0][0])
+
+
+        for subject_id, max_value, avg_value in grade_data:
+            if subject_id in temp:
+                result[subject_id].append(max_value)
+                result[subject_id].append(avg_value)
+                total_count_sql = "SELECT COUNT(*) " \
+                                  "FROM scores " \
+                                  "INNER JOIN students " \
+                                  "ON students.id = scores.student_id " \
+                                  "WHERE subject_id = ? " \
+                                  "AND exam_id = ?"
+                cur.execute(total_count_sql, (subject_id, exam_id))
                 data = list(cur)
                 result[subject_id].append(data[0][0])
 
