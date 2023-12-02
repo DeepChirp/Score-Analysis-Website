@@ -66,3 +66,9 @@ tbody tr:nth-child(odd) {
     font-weight: bold;
     border-bottom: 2px solid blue;
 }
+
+.subject-button:disabled {
+    opacity: 1;
+    color: #000000;
+    cursor: not-allowed;
+}

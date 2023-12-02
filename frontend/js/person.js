@@ -253,7 +253,7 @@ class PersonPage {
                         chartSelectDiv.appendChild(thisBtn);
                     }
                 }
-                
+
 
                 // Add selected class to the selected button
                 var buttons = document.querySelectorAll('.subject-button');
@@ -261,14 +261,17 @@ class PersonPage {
                     button.addEventListener('click', function () {
                         buttons.forEach(function (btn) {
                             btn.classList.remove('selected');
+                            btn.disabled = false; // enable all buttons
                         });
                         button.classList.add('selected');
+                        button.disabled = true; // disable the selected button
                     });
                 });
 
                 for (const btn of buttons) {
                     if (btn.textContent === "总分") {
                         btn.classList.add("selected");
+                        btn.disabled = true;
                     }
                 }
 
