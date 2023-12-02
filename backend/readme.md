@@ -1,11 +1,11 @@
-# Backend Daemon V0.10.2
+# Backend Daemon V0.11.0
 
-- Fix bug in /data/chart_data where last10 student list is none due to restriction.
+- Implemention API V0.11.0.
 
-# API V0.10.0
+# API V0.11.0
 
-## V0.10.0改动
-- 新增：/data/chart_data/by_subject/<int:subject_id>/by_class/<int:class_id>
+## V0.11.0改动
+- `/data/by_person`新增：班级最高分、班级平均分、有效人数
 
 SubjectId与科目名称对照表：
 |SubjectId|SubjectName|
@@ -336,6 +336,9 @@ StudentScoreInfoList：
 |0|Double, 该科目成绩|-|
 |1|Int, 该科目班级排名|-|
 |2|Int, 该科目年级排名|-|
+|3|Double, 该科目班级最高分|-|
+|4|Double, 该科目年级平均分|-|
+|5|Int, 该科目班级参考人数|-|
 
 ### GET `/data/by_person/<int:student_id>/exam`
 查询该学生的有效考试（参加全部科目的考试）
