@@ -176,7 +176,7 @@ class ClassPage {
                 gradeAvgTd.textContent = this.overallData[subjectId]["gradeAvgScore"].toFixed(1);
                 gradeMaxTd.textContent = this.overallData[subjectId]["gradeMaxScore"].toFixed(1);
                 const deltaAvgScore = subjectAnalysis["classAvgScore"] - this.overallData[subjectId]["gradeAvgScore"];
-                classAvgTd.innerHTML = `<span style="color: ${deltaAvgScore < 0 ? 'black' : 'green'}">${subjectAnalysis["classAvgScore"].toFixed(1)}</span>`;
+                classAvgTd.innerHTML = `<span style="color: ${deltaAvgScore < 0 ? 'red' : 'green'}">${subjectAnalysis["classAvgScore"].toFixed(1)}</span>`;
                 classAvgRankTd.textContent = subjectAnalysis["classAvgRank"];
                 classMaxTd.textContent = subjectAnalysis["firstScore"].toFixed(1);
                 classMaxNameTd.textContent = subjectAnalysis["firstName"];
