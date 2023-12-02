@@ -24,23 +24,14 @@ h1 {
 tr {
     text-align: center;
 }
-.grid{
-    display:grid;
+
+.grid {
+    display: grid;
     grid-template-columns: 1fr 1fr;
     column-gap: 30px;
 }
-@media (prefers-color-scheme: light)
-{
-    body{
-        background-color: #f8f8f8; 
-    }   
-}
-@media (prefers-color-scheme: dark){
-    body{
-        background-color: #1e2021;
-    }
-}
-.pic{
+
+.pic {
     height: 300px;
     width: 80%;
 }
