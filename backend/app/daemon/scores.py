@@ -214,10 +214,9 @@ def get_chart_data_by_subject(subject_id, class_id):
                                "WHERE exam_id = ? " \
                                "AND subject_id = ? " \
                                "AND class = ? " \
-                              "AND student_id IN (SELECT student_id FROM scores WHERE exam_id = ? GROUP BY student_id HAVING COUNT(id) >= 6) " \
                                "ORDER BY value " \
                                "LIMIT 10"
-            cur.execute(last10_data_sql, (exam_id, subject_id, class_id, exam_id))
+            cur.execute(last10_data_sql, (exam_id, subject_id, class_id))
             score_lst = [x[0] for x in list(cur)]
             class_data[exam_id]["last10AvgScore"] = numpy.average(score_lst)
             class_data[exam_id]["last10AvgScoreRank"] = get_grade_rank(cur, subject_id, exam_id,
