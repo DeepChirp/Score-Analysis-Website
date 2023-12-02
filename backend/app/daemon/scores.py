@@ -784,6 +784,18 @@ def get_data_by_person(student_id, exam_id):
           "WHERE scores.student_id = ? AND exam_id = ?"
     cur.execute(sql, (exam_id, student_id, exam_id, class_id, student_id, student_id, exam_id))
     data = list(cur)
+
+    class_sql = "SELECT subject_id, MAX(value), AVG(value) " \
+                "FROM scores " \
+                "INNER JOIN students " \
+                "ON students.id = scores.student_id " \
+                "WHERE class = ? " \
+                "AND exam_id = ? " \
+                "GROUP BY subject_id"
+    cur.execute(class_sql, (class_id, exam_id))
+    class_data = list(cur)
+
+
     if len(data) == 0 or data[0][0] is None:
         ret = {"code": 404, "msg": "Not Found", "data": {}}
     else:
@@ -793,6 +805,21 @@ def get_data_by_person(student_id, exam_id):
         result = {}
         for key, value in temp.items():
             result[key] = value
+
+        for subject_id, max_value, avg_value in class_data:
+            if subject_id in temp:
+                result[subject_id].append(max_value)
+                result[subject_id].append(avg_value)
+                total_count_sql = "SELECT COUNT(*) " \
+                                  "FROM scores " \
+                                  "INNER JOIN students " \
+                                  "ON students.id = scores.student_id " \
+                                  "WHERE class = ? " \
+                                  "AND subject_id = ? " \
+                                  "AND exam_id = ?"
+                cur.execute(total_count_sql, (class_id, subject_id, exam_id))
+                data = list(cur)
+                result[subject_id].append(data[0][0])
 
         total_sql = "SELECT temp.v, temp.rank " \
                     "FROM(SELECT tvalue.student_id , v, RANK() OVER (ORDER BY tvalue.v DESC) AS rank FROM (SELECT student_id, SUM(value) AS v FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = ? GROUP BY name) AS tvalue) AS temp " \
@@ -806,7 +833,17 @@ def get_data_by_person(student_id, exam_id):
         cur.execute(class_rank_sql, (exam_id, class_id, student_id))
         data = list(cur)
         total_class_rank = data[0][0]
-        result[255] = [total_score, total_class_rank, total_grade_rank]
+
+        class_data_sql = "SELECT MAX(tvalue), AVG(tvalue) " \
+                         "FROM (SELECT SUM(value) AS tvalue FROM scores INNER JOIN students ON students.id = scores.student_id WHERE class = ? AND exam_id = ? GROUP BY student_id) AS t"
+        cur.execute(class_data_sql, (class_id, exam_id))
+        class_data = list(cur)
+
+        class_total_sql = "SELECT COUNT(*) " \
+                          "FROM (SELECT student_id FROM scores INNER JOIN students ON students.id = scores.student_id WHERE exam_id = ? AND class = ? AND class_divide = 0 GROUP BY student_id HAVING COUNT(*) >= 6) AS t"
+        cur.execute(class_total_sql, (exam_id, class_id))
+        class_total = list(cur)
+        result[255] = [total_score, total_class_rank, total_grade_rank, class_data[0][0], class_data[0][1], class_total[0][0]]
         ret = {"code": 200, "msg": "Ok", "data": {"scores": result}}
     return ret
 
