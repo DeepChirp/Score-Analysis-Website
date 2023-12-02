@@ -44,4 +44,5 @@
 
 .nav-item .navbar-button.active {
     color: #007bff;
+    font-weight: bold;
 }
