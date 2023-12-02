@@ -313,10 +313,7 @@ class ClassPage {
 
                 }
 
-                let minScore = Math.min(...classAvgLst, ...gradeAvgLst, ...lastTenAvgLst) - 10;
-                if (minScore < 0) {
-                    minScore = 0;
-                }
+                let minScore = Math.max(Math.min(...classAvgLst, ...gradeAvgLst, ...lastTenAvgLst) - 10, 0);
                 let maxScore = subjectFullScore[subjectId];
 
                 let minStd = 0;
