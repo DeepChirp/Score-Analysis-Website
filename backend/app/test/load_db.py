@@ -42,6 +42,20 @@ semester_to_id ={
     "高三下": 6
 }
 
+# cur.execute("DROP PROCEDURE IF EXISTS DropIndexIfExists")
+# Delete the procedure if it exists, avoiding error
+cur.execute("""
+CREATE PROCEDURE DropIndexIfExists(IN tableName VARCHAR(64), IN indexName VARCHAR(64))
+BEGIN
+    IF EXISTS (SELECT NULL FROM INFORMATION_SCHEMA.STATISTICS WHERE table_name = tableName AND index_name = indexName)
+    THEN
+        SET @s = CONCAT('ALTER TABLE ', tableName, ' DROP INDEX ', indexName);
+        PREPARE stmt FROM @s;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+    END IF;
+END
+""")
 
 cur.execute("TRUNCATE TABLE scores")
 cur.execute("TRUNCATE TABLE students")
@@ -50,13 +64,13 @@ cur.execute("TRUNCATE TABLE subjects")
 cur.execute("TRUNCATE TABLE semesters")
 cur.execute("TRUNCATE TABLE grades")
 
-cur.execute("DROP INDEX idx_student_id ON scores")
-cur.execute("DROP INDEX idx_exam_id ON scores")
-cur.execute("DROP INDEX idx_class ON students")
-cur.execute("DROP INDEX idx_student_id_exam_id ON scores")
-cur.execute("DROP INDEX idx_subject_id ON scores")
-cur.execute("DROP INDEX idx_exam_id_subject_id ON scores")
-cur.execute("DROP INDEX idx_value ON scores")
+cur.execute("CALL DropIndexIfExists('scores', 'idx_student_id')")
+cur.execute("CALL DropIndexIfExists('scores', 'idx_exam_id')")
+cur.execute("CALL DropIndexIfExists('students', 'idx_class')")
+cur.execute("CALL DropIndexIfExists('scores', 'idx_student_id_exam_id')")
+cur.execute("CALL DropIndexIfExists('scores', 'idx_subject_id')")
+cur.execute("CALL DropIndexIfExists('scores', 'idx_exam_id_subject_id')")
+cur.execute("CALL DropIndexIfExists('scores', 'idx_value')")
 
 conn.commit()
 
