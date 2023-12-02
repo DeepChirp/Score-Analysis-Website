@@ -208,16 +208,11 @@ class PersonPage {
                     chartSelectDiv.removeChild(chartSelectDiv.firstChild);
                 }
 
+                let showLst = Object.keys(subjectIdToName);
+                showLst.splice(showLst.indexOf(255), 1);
+                showLst.unshift(255);
                 for (const [subjectId, subjectName] of Object.entries(subjectIdToName)) {
                     if (subjectId in scoresList) {
-                        const thisBtn = document.createElement("button");
-                        thisBtn.textContent = subjectName;
-                        thisBtn.classList.add("subject-button");
-                        thisBtn.addEventListener("click", () => {
-                            this.drawChart(subjectId);
-                        });
-                        chartSelectDiv.appendChild(thisBtn);
-
                         let score = scoresList[subjectId][0];
                         let classRank = scoresList[subjectId][1];
                         let gradeRank = scoresList[subjectId][2];
@@ -247,6 +242,18 @@ class PersonPage {
                         scoreTbody.appendChild(thisTr);
                     }
                 }
+                for (const subjectId of showLst) {
+                    if (subjectId in scoresList) {
+                        const thisBtn = document.createElement("button");
+                        thisBtn.textContent = subjectIdToName[subjectId];
+                        thisBtn.classList.add("subject-button");
+                        thisBtn.addEventListener("click", () => {
+                            this.drawChart(subjectId);
+                        });
+                        chartSelectDiv.appendChild(thisBtn);
+                    }
+                }
+                
 
                 // Add selected class to the selected button
                 var buttons = document.querySelectorAll('.subject-button');
@@ -258,6 +265,13 @@ class PersonPage {
                         button.classList.add('selected');
                     });
                 });
+
+                for (const btn of buttons) {
+                    if (btn.textContent === "总分") {
+                        btn.classList.add("selected");
+                    }
+                }
+
             } else {
                 // TODO: Show error message if request failed?
             }

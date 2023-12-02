@@ -1,11 +1,12 @@
-# Backend Daemon V0.11.0
+# Backend Daemon V0.12.0
 
-- Implemention API V0.11.0.
+- Implemention API V0.12.0.
 
-# API V0.11.0
+# API V0.12.0
 
-## V0.11.0改动
-- `/data/by_person`新增：班级最高分、班级平均分、有效人数
+## V0.12.0改动
+- `/data/by_person`调整顺序
+- `/data/by_person`新增：班级最高分、班级平均分、班级参考人数、年级最高分、年级平均分、年级参考人数
 
 SubjectId与科目名称对照表：
 |SubjectId|SubjectName|
@@ -337,8 +338,12 @@ StudentScoreInfoList：
 |1|Int, 该科目班级排名|-|
 |2|Int, 该科目年级排名|-|
 |3|Double, 该科目班级最高分|-|
-|4|Double, 该科目年级平均分|-|
+|4|Double, 该科目班级平均分|-|
 |5|Int, 该科目班级参考人数|-|
+|6|Double, 该科目年级最高分|-|
+|7|Double, 该科目年级平均分|-|
+|8|Int, 该科目年级参考人数|-|
+
 
 ### GET `/data/by_person/<int:student_id>/exam`
 查询该学生的有效考试（参加全部科目的考试）
