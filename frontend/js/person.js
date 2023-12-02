@@ -223,6 +223,13 @@ class PersonPage {
                         const scoreTd = document.createElement("td");
                         scoreTd.textContent = score;
                         thisTr.appendChild(scoreTd);
+                        const avgScoreTd = document.createElement("td");
+                        avgScoreTd.textContent = `${scoresList[subjectId][4].toFixed(1)}/${scoresList[subjectId][7].toFixed(1)}`;
+                        thisTr.append(avgScoreTd);
+                        const maxScoreTd = document.createElement("td");
+                        maxScoreTd.textContent = `${scoresList[subjectId][3]}/${scoresList[subjectId][6]}`;
+                        thisTr.append(maxScoreTd);
+                        const totalTd = document.createElement("td");
                         const classRankTd = document.createElement("td");
                         const gradeRankTd = document.createElement("td");
                         if (lastExamId != -1) {
@@ -239,6 +246,8 @@ class PersonPage {
                         }
                         thisTr.appendChild(classRankTd);
                         thisTr.appendChild(gradeRankTd);
+                        totalTd.textContent = `${scoresList[subjectId][5]}/${scoresList[subjectId][8]}`;
+                        thisTr.append(totalTd);
                         scoreTbody.appendChild(thisTr);
                     }
                 }
