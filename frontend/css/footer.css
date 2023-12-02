@@ -11,3 +11,10 @@ footer {
     color: #bbb;
     text-align: center;
 }
+
+.footer-content a {
+    margin: 0;
+    padding: 0;
+    color: #bbb;
+    text-align: center;
+}
