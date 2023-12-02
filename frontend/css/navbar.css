@@ -41,3 +41,7 @@
 .nav-item:hover {
     background-color: #f2f2f2;
 }
+
+.nav-item .navbar-button.active {
+    color: #007bff;
+}
