@@ -190,6 +190,10 @@ function loadPageContent(url) {
                     if (scriptSrc.endsWith('class.js')) {
                         window.isClassJsLoadedFirstTime = true;
                     }
+
+                    if (scriptSrc.endsWith('data.js')) {
+                        window.isDataJsLoadedFirstTime = true;
+                    }
                 } else {
                     script.text = this.innerText;
                 }
@@ -200,6 +204,8 @@ function loadPageContent(url) {
             } else if (scriptSrc.endsWith('class.js')) {
                 // 如果 class.js 已经被加载过，设置全局标记
                 window.isClassJsLoadedFirstTime = false;
+            } else if (scriptSrc.endsWith('data.js')) {
+                window.isDataJsLoadedFirstTime = false;
             }
         });
 
@@ -214,6 +220,12 @@ function loadPageContent(url) {
             console.log('class.js already loaded, initializing ClassPage instance.');
             window["classPage"] = new ClassPage();
             window.classPage.initEventListeners();
+        }
+
+        if (url === 'data.html' && !window.isDataJsLoadedFirstTime) {
+            console.log('data.js already loaded, initializing DataPage instance.');
+            window["dataPage"] = new DataPage();
+            window.dataPage.initEventListeners();
         }
     });
 }
