@@ -24,14 +24,3 @@ h1 {
 tr {
     text-align: center;
 }
-
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: 30px;
-}
-
-.pic {
-    height: 300px;
-    width: 80%;
-}
