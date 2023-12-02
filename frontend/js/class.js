@@ -206,6 +206,7 @@ class ClassPage {
                 });
                 subjectSelectionDiv.appendChild(thisBtn);
             }
+            this.showClassAnalysisBySubject(classId, 1, subjectSelectionDiv.firstChild);
         }
         else {
             // TODO: Show error message if request failed?
@@ -312,7 +313,7 @@ class ClassPage {
 
                 }
 
-                let minScore = Math.min(...classAvgLst, ...gradeAvgLst) - 10;
+                let minScore = Math.min(...classAvgLst, ...gradeAvgLst, ...lastTenAvgLst) - 10;
                 if (minScore < 0) {
                     minScore = 0;
                 }
