@@ -1,6 +1,6 @@
-# Backend Daemon V0.10.1
+# Backend Daemon V0.10.2
 
-- Fix bug in /data/chart_data where total score analysis was mistakenly placed into examId.
+- Fix bug in /data/chart_data where last10 student list is none due to restriction.
 
 # API V0.10.0
 
