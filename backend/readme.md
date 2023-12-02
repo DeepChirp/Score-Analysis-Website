@@ -1,6 +1,6 @@
-# Backend Daemon V0.12.0
+# Backend Daemon V0.12.1
 
-- Implemention API V0.12.0.
+- Fix missing API implemtion in total score.
 
 # API V0.12.0
 

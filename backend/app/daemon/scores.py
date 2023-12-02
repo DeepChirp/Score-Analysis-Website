@@ -866,7 +866,18 @@ def get_data_by_person(student_id, exam_id):
                           "FROM (SELECT student_id FROM scores INNER JOIN students ON students.id = scores.student_id WHERE exam_id = ? AND class = ? AND class_divide = 0 GROUP BY student_id HAVING COUNT(*) >= 6) AS t"
         cur.execute(class_total_sql, (exam_id, class_id))
         class_total = list(cur)
-        result[255] = [total_score, total_class_rank, total_grade_rank, class_data[0][0], class_data[0][1], class_total[0][0]]
+
+        grade_data_sql = "SELECT MAX(tvalue), AVG(tvalue) " \
+                         "FROM (SELECT SUM(value) AS tvalue FROM scores INNER JOIN students ON students.id = scores.student_id WHERE exam_id = ? GROUP BY student_id) AS t"
+        cur.execute(grade_data_sql, (exam_id, ))
+        grade_data = list(cur)
+
+        grade_total_sql = "SELECT COUNT(*) " \
+                          "FROM (SELECT student_id FROM scores INNER JOIN students ON students.id = scores.student_id WHERE exam_id = ? AND class_divide = 0 GROUP BY student_id HAVING COUNT(*) >= 6) AS t"
+        cur.execute(grade_total_sql, (exam_id,))
+        grade_total = list(cur)
+
+        result[255] = [total_score, total_class_rank, total_grade_rank, class_data[0][0], class_data[0][1], class_total[0][0], grade_data[0][0], grade_data[0][1], grade_total[0][0]]
         ret = {"code": 200, "msg": "Ok", "data": {"scores": result}}
     return ret
 
