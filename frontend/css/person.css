@@ -141,15 +141,20 @@ tbody tr:nth-child(odd) {
     cursor: pointer;
     text-align: center;
     font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+.subject-button:hover {
+    color: #007bff;
 }
 
 .subject-button.selected {
     font-weight: bold;
-    border-bottom: 2px solid blue;
+    border-bottom: 2px solid #007bff;
 }
 
 .subject-button:disabled {
     opacity: 1;
-    color: #000000;
+    color: #007bff;
     cursor: not-allowed;
 }
