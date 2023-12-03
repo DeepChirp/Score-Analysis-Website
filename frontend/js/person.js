@@ -377,6 +377,9 @@ class PersonPage {
 
         }
 
+        let minScore = Math.max(Math.min(...scores, ...classAvgScores, ...gradeAvgScores) - 10, 0);
+        let maxScore = subjectFullScore[subjectId];
+
 
         new Chart(scoreCanvas, {
             type: "line",
@@ -394,7 +397,8 @@ class PersonPage {
                         data: classAvgScores,
                         borderColor: "#6c25be",
                         fill: false,
-                        hidden: true
+                        hidden: true,
+                        borderDash: [5, 5] // Make this line dashed
                     },
                     {
                         label: "班级最高分",
@@ -407,7 +411,8 @@ class PersonPage {
                         label: "年级平均分",
                         data: gradeAvgScores,
                         borderColor: "#bea925",
-                        fill: false
+                        fill: false,
+                        borderDash: [5, 5] // Make this line dashed
                     },
                     {
                         label: "年级最高分",
@@ -416,6 +421,14 @@ class PersonPage {
                         fill: false
                     }
                 ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        min: minScore,
+                        max: maxScore
+                    }
+                }
             }
         }
         );
