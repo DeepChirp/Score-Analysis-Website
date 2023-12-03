@@ -79,12 +79,29 @@
     flex: 1 1;
 }
 
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table,
+th,
+td {
+    border: 1px solid #add8e6;
+}
+
 thead tr {
-    background-color: #adabab;
+    background-color: #d4e2f0;
+    color: #000000;
+    font-size: 1.2em;
+}
+
+tbody tr {
+    height: 50px;
 }
 
 tbody tr:nth-child(even) {
-    background-color: #cfcfcf;
+    background-color: #e6f7ff;
 }
 
 tbody tr:nth-child(odd) {

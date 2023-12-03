@@ -1,3 +1,11 @@
+:root {
+    --button-padding: 10px 20px;
+    --button-border-radius: 5px;
+    --button-background-color: #007bff;
+    --button-color: white;
+    --button-cursor: pointer;
+}
+
 .student-selection-div {
     display: flex;
     flex-wrap: wrap;
@@ -21,9 +29,10 @@
 }
 
 .student-selection-div select,
-.student-selection-div input {
-    padding: 10px;
-    border-radius: 5px;
+.student-selection-div input,
+.button-group button {
+    padding: var(--button-padding);
+    border-radius: var(--button-border-radius);
     border: 1px solid #ddd;
 }
 
@@ -35,12 +44,10 @@
 }
 
 .button-group button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
+    background-color: var(--button-background-color);
+    color: var(--button-color);
     border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    cursor: var(--button-cursor);
     transition: background-color 0.3s;
 }
 
@@ -69,12 +76,29 @@
     display: flex;
 }
 
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table,
+th,
+td {
+    border: 1px solid #add8e6;
+}
+
 thead tr {
-    background-color: #adabab;
+    background-color: #d4e2f0;
+    color: #000000;
+    font-size: 1.2em;
+}
+
+tbody tr {
+    height: 50px;
 }
 
 tbody tr:nth-child(even) {
-    background-color: #cfcfcf;
+    background-color: #e6f7ff;
 }
 
 tbody tr:nth-child(odd) {
@@ -85,9 +109,11 @@ tbody tr:nth-child(odd) {
     display: none;
     margin-top: 5em;
     margin-bottom: 5em;
-    border: 1px solid #ffffff;
-    border-radius: 0.5em;
-    background-color: #ffffff;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
 }
 
 #chart-container-title {
@@ -100,7 +126,6 @@ tbody tr:nth-child(odd) {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
     overflow: hidden;
-    margin: 1em;
 }
 
 #student-score-chart-select-div {
