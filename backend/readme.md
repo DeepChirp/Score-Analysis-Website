@@ -1,12 +1,11 @@
-# Backend Daemon V0.12.1
+# Backend Daemon V0.13.0
 
-- Fix missing API implemtion in total score.
+- Implemention API V0.13.0
 
-# API V0.12.0
+# API V0.13.0
 
-## V0.12.0改动
-- `/data/by_person`调整顺序
-- `/data/by_person`新增：班级最高分、班级平均分、班级参考人数、年级最高分、年级平均分、年级参考人数
+## V0.13.0改动
+- `/data/by_person/<int:student_id>/exam_detail`新增班级/年级最高分/平均分
 
 SubjectId与科目名称对照表：
 |SubjectId|SubjectName|
@@ -383,4 +382,15 @@ ret:
 data：
 |Item|Value|Description|
 |  ----  | ----  | ---- |
-|examDetails|dict/Object，每个元素的键为考试id，值为ScoresBySubject|ScoresBySubject详见上|
+|examDetails|dict/Object，每个元素的键为考试id，值为ScoresBySubject|详见下|
+
+ScoresBySubject：
+|Index|Value|Description|
+|  ----  | ----  | ---- |
+|0|Double，该科目分数|-|    
+|1|Int，该班级排名|-|
+|2|Int，该年级排名|-|
+|3|Double，该班级最高分|-|
+|4|Double，该班级平均分|-|
+|5|Double，该年级最高分|-|
+|6|Double，该年级平均分|-|

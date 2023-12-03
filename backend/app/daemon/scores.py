@@ -955,6 +955,33 @@ def get_exam_detail_by_person(student_id):
             for key, value in temp.items():
                 result[key] = value
 
+            class_data_sql = "SELECT subject_id, MAX(value), AVG(value) " \
+                             "FROM scores " \
+                             "INNER JOIN students " \
+                             "ON scores.student_id = students.id " \
+                             "WHERE exam_id = ? " \
+                             "AND class = ? " \
+                             "GROUP BY subject_id"
+            cur.execute(class_data_sql, (exam_id, class_id))
+            data = list(cur)
+            for subject_id, max_score, avg_score in data:
+                if subject_id in result:
+                    result[subject_id].append(max_score)
+                    result[subject_id].append(avg_score)
+
+            grade_data_sql = "SELECT subject_id, MAX(value), AVG(value) " \
+                             "FROM scores " \
+                             "INNER JOIN students " \
+                             "ON scores.student_id = students.id " \
+                             "WHERE exam_id = ? " \
+                             "GROUP BY subject_id"
+            cur.execute(grade_data_sql, (exam_id,))
+            data = list(cur)
+            for subject_id, max_score, avg_score in data:
+                if subject_id in result:
+                    result[subject_id].append(max_score)
+                    result[subject_id].append(avg_score)
+
             total_sql = "SELECT temp.v, temp.rank " \
                         "FROM(SELECT tvalue.student_id , v, RANK() OVER (ORDER BY tvalue.v DESC) AS rank FROM (SELECT student_id, SUM(value) AS v FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = ? GROUP BY name) AS tvalue) AS temp " \
                         "WHERE temp.student_id = ?"
@@ -968,6 +995,24 @@ def get_exam_detail_by_person(student_id):
             data = list(cur)
             total_class_rank = data[0][0]
             result[255] = [total_score, total_class_rank, total_grade_rank]
+
+            class_total_data_sql = "SELECT MAX(tvalue), AVG(tvalue) " \
+                                   "FROM (SELECT SUM(value) AS tvalue FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = ? AND class = ? GROUP BY student_id) AS t"
+            cur.execute(class_total_data_sql, (exam_id, class_id))
+            data = list(cur)
+
+            for max_score, avg_score in data:
+                result[255].append(max_score)
+                result[255].append(avg_score)
+
+            grade_total_data_sql = "SELECT MAX(tvalue), AVG(tvalue) " \
+                                   "FROM (SELECT SUM(value) AS tvalue FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = ? GROUP BY student_id) AS t"
+            cur.execute(grade_total_data_sql, (exam_id, ))
+            data = list(cur)
+
+            for max_score, avg_score in data:
+                result[255].append(max_score)
+                result[255].append(avg_score)
             ret_result[exam_id] = result
     ret = {"code": 200, "msg": "Ok", "data": {"examDetails": ret_result}}
     return ret
