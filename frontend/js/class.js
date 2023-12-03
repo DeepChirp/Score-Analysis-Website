@@ -530,9 +530,6 @@ class ClassPage {
         let data = await this.doGetValidNum(examSelection.value, classSelection.value)
         if (data["code"] === 200) {
             const validNum = data["data"]["validNum"];
-            const classSpan = document.querySelector("#class-id");
-            classSpan.textContent = classSelection.value;
-
             const validNumSpan = document.querySelector("#valid-num");
             validNumSpan.textContent = validNum;
             basicInfoDiv.style.display = "block";

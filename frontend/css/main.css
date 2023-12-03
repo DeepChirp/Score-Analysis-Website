@@ -5,6 +5,7 @@ body {
     display: flex;
     flex-direction: column;
     background-color: #f8f8f8;
+    font-family: Arial, sans-serif;
 }
 
 .main-content {
@@ -23,4 +24,13 @@ h1 {
 
 tr {
     text-align: center;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.title h1 {
+    color: #007bff;
 }
