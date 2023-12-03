@@ -1,5 +1,5 @@
 class DataPage {
-    constructor () {
+    constructor() {
         this.uniqueIdLst = [];
         this.examInfoBySemester = {};
         this.examData = {};
@@ -81,7 +81,7 @@ class DataPage {
         for (const uniqueId of this.uniqueIdLst) {
             const data = await this.doTriggerCsvLoad(uniqueId);
             if (data["code"] === 200) {
-                loadedCount ++;
+                loadedCount++;
             } else {
                 // TODO: Show error message if request failed?
             }
@@ -114,7 +114,7 @@ class DataPage {
         else {
             // TODO: Show error message if request failed?
         }
-        
+
     }
 
     initEventListeners() {
@@ -125,12 +125,12 @@ class DataPage {
         loadBtn.addEventListener("click", () => {
             this.loadCsv();
         });
-        const pond = FilePond.create(fileUploader);
-        pond.allowMultiple = true;
-        pond.chunkUploads = false;
-        pond.allowRevert = false;
-        pond.maxFileSize = "1MB";
-        pond.setOptions({
+        const pond = FilePond.create(fileUploader, {
+            allowMultiple: true,
+            chunkUploads: false,
+            allowRevert: false,
+            maxFileSize: "1MB",
+            acceptedFileTypes: ['text/csv', 'application/vnd.ms-excel'],
             server: {
                 process: {
                     url: '/api/scores/data/upload',
@@ -158,7 +158,7 @@ class DataPage {
                 downloadBtn.textContent = "下载";
                 downloadBtn.disabled = false;
             });
-            
+
         });
     }
 }
