@@ -358,6 +358,10 @@ class PersonPage {
 
         let labels = [];
         let scores = [];
+        let classMaxScores = [];
+        let classAvgScores = [];
+        let gradeMaxScores = [];
+        let gradeAvgScores = [];
         let gradeRanks = [];
         for (const [examId, examDetail] of Object.entries(this.examDetailByPerson)) {
             if (subjectId in examDetail) {
@@ -365,6 +369,10 @@ class PersonPage {
                 labels.push(this.examIdToName[examId]);
                 scores.push(examDetail[subjectId][0]);
                 gradeRanks.push(examDetail[subjectId][2]);
+                classMaxScores.push(examDetail[subjectId][3]);
+                classAvgScores.push(examDetail[subjectId][4]);
+                gradeMaxScores.push(examDetail[subjectId][5]);
+                gradeAvgScores.push(examDetail[subjectId][6]);
             }
 
         }
@@ -379,6 +387,30 @@ class PersonPage {
                         label: "分数",
                         data: scores,
                         borderColor: "#007bff",
+                        fill: false
+                    },
+                    {
+                        label: "班级平均分",
+                        data: classAvgScores,
+                        borderColor: "#6c25be",
+                        fill: false
+                    },
+                    {
+                        label: "班级最高分",
+                        data: classMaxScores,
+                        borderColor: "#D716D9",
+                        fill: false
+                    },
+                    {
+                        label: "年级平均分",
+                        data: gradeAvgScores,
+                        borderColor: "#bea925",
+                        fill: false
+                    },
+                    {
+                        label: "年级最高分",
+                        data: gradeMaxScores,
+                        borderColor: "#DF7F10",
                         fill: false
                     }
                 ]
