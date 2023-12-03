@@ -154,9 +154,11 @@ class DataPage {
             downloadBtn.disabled = true;
             downloadBtn.textContent = "Loading...";
             const examSelection = document.querySelector("#exam-selection");
-            this.downloadData(examSelection.value);
-            downloadBtn.textContent = "下载";
-            downloadBtn.disabled = false;
+            this.downloadData(examSelection.value).then(() => {
+                downloadBtn.textContent = "下载";
+                downloadBtn.disabled = false;
+            });
+            
         });
     }
 }
