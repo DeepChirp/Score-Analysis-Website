@@ -1,13 +1,44 @@
+import io
+
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for, jsonify
+    Blueprint, flash, g, redirect, render_template, request, session, url_for, jsonify, current_app
 )
 import numpy
 from daemon.db import get_db
 import json
+import random
+import os
+import csv
 
 bp = Blueprint("scores", __name__, url_prefix="/scores")
 
+grades_name_to_id = {
+    "本高2023届": 1
+}
 
+subjects_to_id = {
+    "语文": [1, 150],
+    "数学": [2, 150],
+    "外语": [3, 150],
+    "物理": [4, 100],
+    "化学": [5, 100],
+    "生物": [6, 100],
+    "政治": [7, 100],
+    "历史": [8, 100],
+    "地理": [9, 100]
+}
+
+student_to_id = {}
+exams_to_id = {}
+
+semester_to_id ={
+    "高一上": 1,
+    "高一下": 2,
+    "高二上": 3,
+    "高二下": 4,
+    "高三上": 5,
+    "高三下": 6
+}
 @bp.route("/basic_info/exam", methods=("GET",))
 def get_exam():
     db = get_db()
@@ -759,7 +790,7 @@ def get_analysis_by_class(class_id, exam_id):
     result = {"code": 200, "msg": "Ok.", "data": subject_result}
     # Flask's jsonify() seems to be broken, so I use json.dumps() instead.
     # TypeError: '<' not supported between instances of 'str' and 'int'
-    return json.dumps(result), 200, {'Content-Type': 'text/css; charset=utf-8'}
+    return json.dumps(result), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
 
 @bp.route("data/by_person/<int:student_id>/exam/<int:exam_id>", methods=("GET",))
@@ -866,7 +897,18 @@ def get_data_by_person(student_id, exam_id):
                           "FROM (SELECT student_id FROM scores INNER JOIN students ON students.id = scores.student_id WHERE exam_id = ? AND class = ? AND class_divide = 0 GROUP BY student_id HAVING COUNT(*) >= 6) AS t"
         cur.execute(class_total_sql, (exam_id, class_id))
         class_total = list(cur)
-        result[255] = [total_score, total_class_rank, total_grade_rank, class_data[0][0], class_data[0][1], class_total[0][0]]
+
+        grade_data_sql = "SELECT MAX(tvalue), AVG(tvalue) " \
+                         "FROM (SELECT SUM(value) AS tvalue FROM scores INNER JOIN students ON students.id = scores.student_id WHERE exam_id = ? GROUP BY student_id) AS t"
+        cur.execute(grade_data_sql, (exam_id, ))
+        grade_data = list(cur)
+
+        grade_total_sql = "SELECT COUNT(*) " \
+                          "FROM (SELECT student_id FROM scores INNER JOIN students ON students.id = scores.student_id WHERE exam_id = ? AND class_divide = 0 GROUP BY student_id HAVING COUNT(*) >= 6) AS t"
+        cur.execute(grade_total_sql, (exam_id,))
+        grade_total = list(cur)
+
+        result[255] = [total_score, total_class_rank, total_grade_rank, class_data[0][0], class_data[0][1], class_total[0][0], grade_data[0][0], grade_data[0][1], grade_total[0][0]]
         ret = {"code": 200, "msg": "Ok", "data": {"scores": result}}
     return ret
 
@@ -944,6 +986,33 @@ def get_exam_detail_by_person(student_id):
             for key, value in temp.items():
                 result[key] = value
 
+            class_data_sql = "SELECT subject_id, MAX(value), AVG(value) " \
+                             "FROM scores " \
+                             "INNER JOIN students " \
+                             "ON scores.student_id = students.id " \
+                             "WHERE exam_id = ? " \
+                             "AND class = ? " \
+                             "GROUP BY subject_id"
+            cur.execute(class_data_sql, (exam_id, class_id))
+            data = list(cur)
+            for subject_id, max_score, avg_score in data:
+                if subject_id in result:
+                    result[subject_id].append(max_score)
+                    result[subject_id].append(avg_score)
+
+            grade_data_sql = "SELECT subject_id, MAX(value), AVG(value) " \
+                             "FROM scores " \
+                             "INNER JOIN students " \
+                             "ON scores.student_id = students.id " \
+                             "WHERE exam_id = ? " \
+                             "GROUP BY subject_id"
+            cur.execute(grade_data_sql, (exam_id,))
+            data = list(cur)
+            for subject_id, max_score, avg_score in data:
+                if subject_id in result:
+                    result[subject_id].append(max_score)
+                    result[subject_id].append(avg_score)
+
             total_sql = "SELECT temp.v, temp.rank " \
                         "FROM(SELECT tvalue.student_id , v, RANK() OVER (ORDER BY tvalue.v DESC) AS rank FROM (SELECT student_id, SUM(value) AS v FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = ? GROUP BY name) AS tvalue) AS temp " \
                         "WHERE temp.student_id = ?"
@@ -957,6 +1026,216 @@ def get_exam_detail_by_person(student_id):
             data = list(cur)
             total_class_rank = data[0][0]
             result[255] = [total_score, total_class_rank, total_grade_rank]
+
+            class_total_data_sql = "SELECT MAX(tvalue), AVG(tvalue) " \
+                                   "FROM (SELECT SUM(value) AS tvalue FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = ? AND class = ? GROUP BY student_id) AS t"
+            cur.execute(class_total_data_sql, (exam_id, class_id))
+            data = list(cur)
+
+            for max_score, avg_score in data:
+                result[255].append(max_score)
+                result[255].append(avg_score)
+
+            grade_total_data_sql = "SELECT MAX(tvalue), AVG(tvalue) " \
+                                   "FROM (SELECT SUM(value) AS tvalue FROM scores INNER JOIN students ON scores.student_id = students.id WHERE exam_id = ? GROUP BY student_id) AS t"
+            cur.execute(grade_total_data_sql, (exam_id, ))
+            data = list(cur)
+
+            for max_score, avg_score in data:
+                result[255].append(max_score)
+                result[255].append(avg_score)
             ret_result[exam_id] = result
     ret = {"code": 200, "msg": "Ok", "data": {"examDetails": ret_result}}
     return ret
+
+def get_unique_id(instance_path):
+    rand_directory = random.randint(0, 1000000000)
+    if os.path.exists("{}/{}".format(instance_path, rand_directory)):
+        return get_unique_id(instance_path)
+    else:
+        return rand_directory
+
+
+@bp.route("data/upload", methods=("GET", "POST"))
+def upload_data():
+    instance_path = current_app.instance_path
+    if request.method == "POST":
+        unique_id = get_unique_id(instance_path)
+        f = request.files["file-uploader"]
+        f.save("{}/{}".format(instance_path, unique_id))
+        file_sql = "INSERT INTO uploads (unique_id, filename) VALUES (?, ?)"
+        db = get_db()
+        cur = db.cursor()
+        cur.execute(file_sql, (unique_id, f.filename))
+        db.commit()
+        return str(unique_id), 200, {'Content-Type': 'text/plain'}
+    else:
+        request.args.get("file-uploader")
+        return "OK", 200, {'Content-Type': 'text/plain'}
+
+def load_db(filename, conn, csv_reader):
+    cur = conn.cursor()
+    front, prefix = filename.split(".")
+    if prefix == "csv":
+        semester_name, exam_name = front[2:].split("_")
+        for row in csv_reader:
+            grade_name, class_id, student_name, chinese, math, english, physics, chemistry, biology, politic, history, geography = row
+
+            if grade_name == "年级":
+                continue
+
+            if grade_name in grades_name_to_id:
+                grade_id = grades_name_to_id[grade_name]
+            else:
+                grades_id_sql = "SELECT id FROM grades WHERE name = ?"
+                cur.execute(grades_id_sql, (grade_name,))
+                data = list(cur)
+                if len(data) != 0 and data[0][0] is not None:
+                    grade_id = data[0][0]
+                    grades_name_to_id[grade_name] = grade_id
+                else:
+                    grades_sql = "INSERT INTO grades (name) VALUES (?)"
+                    cur.execute(grades_sql, (grade_name,))
+                    conn.commit()
+                    grades_id_sql = "SELECT id FROM grades WHERE name = ?"
+                    cur.execute(grades_id_sql, (grade_name,))
+                    grade_id = list(cur)[0][0]
+                    grades_name_to_id[grade_name] = grade_id
+
+            if student_name in student_to_id:
+                student_id = student_to_id[student_name]
+            else:
+                id_sql = "SELECT id FROM students WHERE name = ?"
+                cur.execute(id_sql, (student_name,))
+                print(student_name)
+                data = list(cur)
+                if len(data) != 0 and data[0][0] is not None:
+                    student_id = data[0][0]
+                    student_to_id[student_name] = student_id
+                else:
+                    isql = "INSERT INTO students (class, name, class_divide, grade_id) VALUES (?, ?, ?, ?)"
+                    if class_id.strip() == "":
+                        class_id = "17班"
+                    cur.execute(isql, (int(class_id[:-1]), student_name, 0, grade_id))
+                    conn.commit()
+                    id_sql = "SELECT id FROM students WHERE name = ?"
+                    cur.execute(id_sql, (student_name,))
+                    data = list(cur)
+                    student_id = data[0][0]
+
+            exam_saved_name = "{}_{}".format(semester_name, exam_name)
+            if exam_saved_name in exams_to_id:
+                exam_id = exams_to_id[exam_saved_name]
+            else:
+                exams_id_sql = "SELECT id FROM exams WHERE name = ?"
+                cur.execute(exams_id_sql, (exam_saved_name, ))
+                data = list(cur)
+                if len(data) != 0 and data[0][0] is not None:
+                    exam_id = data[0][0]
+                    exams_to_id[exam_saved_name] = exam_id
+                else:
+                    exams_sql = "INSERT INTO exams (name) VALUES (?)"
+                    cur.execute(exams_sql, (exam_saved_name,))
+                    conn.commit()
+                    exams_id_sql = "SELECT id FROM exams WHERE name = ?"
+                    cur.execute(exams_id_sql, (exam_saved_name,))
+                    exam_id = list(cur)[0][0]
+                    exams_to_id[exam_saved_name] = exam_id
+
+            semester_id = semester_to_id[semester_name]
+            if chinese.strip() != "/":
+                chinese_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                cur.execute(chinese_sql, (student_id, exam_id, 1, semester_id, float(chinese)))
+            if math.strip() != "/":
+                math_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                cur.execute(math_sql, (student_id, exam_id, 2, semester_id, float(math)))
+            if english.strip() != "/":
+                english_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                cur.execute(english_sql, (student_id, exam_id, 3, semester_id, float(english)))
+            if physics.strip() != "/":
+                physics_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                cur.execute(physics_sql, (student_id, exam_id, 4, semester_id, float(physics)))
+            if chemistry.strip() != "/":
+                chemistry_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                cur.execute(chemistry_sql, (student_id, exam_id, 5, semester_id, float(chemistry)))
+            if biology.strip() != "/":
+                biology_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                cur.execute(biology_sql, (student_id, exam_id, 6, semester_id, float(biology)))
+            if politic.strip() != "/":
+                politic_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                cur.execute(politic_sql, (student_id, exam_id, 7, semester_id, float(politic)))
+            if history.strip() != "/":
+                history_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                cur.execute(history_sql, (student_id, exam_id, 8, semester_id, float(history)))
+            if geography.strip() != "/":
+                geography_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                cur.execute(geography_sql, (student_id, exam_id, 9, semester_id, float(geography)))
+    conn.commit()
+@bp.route("/data/loadcsv/<int:unique_id>", methods=("GET", ))
+def load_csv(unique_id):
+    instance_path = current_app.instance_path
+    db = get_db()
+    cur = db.cursor()
+    try:
+        with open("{}/{}".format(instance_path, unique_id), "r") as f:
+            reader = csv.reader(f)
+            file_sql = "SELECT filename FROM uploads WHERE unique_id = ?"
+            cur.execute(file_sql, (unique_id, ))
+            filename = list(cur)[0][0]
+            load_db(filename, db, reader)
+            file_del_sql = "DELETE FROM uploads WHERE unique_id = ?"
+            cur.execute(file_del_sql, (unique_id,))
+            db.commit()
+            os.remove("{}/{}".format(instance_path, unique_id))
+    except FileNotFoundError:
+        return {"code": 404, "msg": "File Not Found for uniqueId: {}".format(unique_id), "data": {}}
+    ret = {"code": 200, "msg": "Ok", "data": {}}
+    return ret
+
+@bp.route("/basic_info/saved_name/<int:exam_id>", methods=("GET", ))
+def saved_name(exam_id):
+    db = get_db()
+    cur = db.cursor()
+    sql = "SELECT name " \
+          "FROM exams " \
+          "WHERE id = ?"
+    cur.execute(sql, (exam_id, ))
+    data = list(cur)
+    if len(data) == 0 or data[0][0] is None:
+        ret = {"code": 404, "msg": "Not found.", "data": {}}
+    else:
+        ret = {"code": 200, "msg": "Ok.", "data": {"savedName": data[0][0]}}
+    return ret
+@bp.route("/data/downloadcsv/<int:exam_id>", methods=("GET", ))
+def download_csv(exam_id):
+    db = get_db()
+    cur = db.cursor()
+    name_sql = "SELECT name " \
+               "FROM exams " \
+               "WHERE id = ?"
+    cur.execute(name_sql, (exam_id, ))
+    data = list(cur)
+    if len(data) == 0 or data[0][0] is None:
+        return "exam for exam_id: {} not found".format(exam_id), 404
+    else:
+        string_output = io.StringIO()
+        writer = csv.writer(string_output)
+        writer.writerow(["年级", "班级", "姓名", "语文", "数学", "外语", "物理", "化学", "生物", "政治", "历史", "地理"])
+        data_sql = "SELECT students.name, class, subject_id, value " \
+                   "FROM scores " \
+                   "INNER JOIN students " \
+                   "ON students.id = scores.student_id " \
+                   "INNER JOIN subjects " \
+                   "ON subjects.id = scores.subject_id " \
+                   "WHERE exam_id = ?"
+        cur.execute(data_sql, (exam_id, ))
+        data = list(cur)
+        student_data = {}
+        for student_name, class_id, subject_id, value in data:
+            student_lst = student_data.setdefault(student_name, ["本高2023届", "{}班".format(class_id), student_name] + ["/"] * 9)
+            op_col = subject_id + 2
+            student_lst[op_col] = value
+        for row in student_data.values():
+            writer.writerow(row)
+
+        return string_output.getvalue(), 200, {'Content-Type': 'text/csv'}

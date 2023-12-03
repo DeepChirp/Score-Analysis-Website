@@ -223,6 +223,13 @@ class PersonPage {
                         const scoreTd = document.createElement("td");
                         scoreTd.textContent = score;
                         thisTr.appendChild(scoreTd);
+                        const avgScoreTd = document.createElement("td");
+                        avgScoreTd.textContent = `${scoresList[subjectId][4].toFixed(1)}/${scoresList[subjectId][7].toFixed(1)}`;
+                        thisTr.append(avgScoreTd);
+                        const maxScoreTd = document.createElement("td");
+                        maxScoreTd.textContent = `${scoresList[subjectId][3]}/${scoresList[subjectId][6]}`;
+                        thisTr.append(maxScoreTd);
+                        const totalTd = document.createElement("td");
                         const classRankTd = document.createElement("td");
                         const gradeRankTd = document.createElement("td");
                         if (lastExamId != -1) {
@@ -239,6 +246,8 @@ class PersonPage {
                         }
                         thisTr.appendChild(classRankTd);
                         thisTr.appendChild(gradeRankTd);
+                        totalTd.textContent = `${scoresList[subjectId][5]}/${scoresList[subjectId][8]}`;
+                        thisTr.append(totalTd);
                         scoreTbody.appendChild(thisTr);
                     }
                 }
@@ -253,7 +262,7 @@ class PersonPage {
                         chartSelectDiv.appendChild(thisBtn);
                     }
                 }
-                
+
 
                 // Add selected class to the selected button
                 var buttons = document.querySelectorAll('.subject-button');
@@ -261,14 +270,17 @@ class PersonPage {
                     button.addEventListener('click', function () {
                         buttons.forEach(function (btn) {
                             btn.classList.remove('selected');
+                            btn.disabled = false; // enable all buttons
                         });
                         button.classList.add('selected');
+                        button.disabled = true; // disable the selected button
                     });
                 });
 
                 for (const btn of buttons) {
                     if (btn.textContent === "总分") {
                         btn.classList.add("selected");
+                        btn.disabled = true;
                     }
                 }
 
@@ -346,6 +358,10 @@ class PersonPage {
 
         let labels = [];
         let scores = [];
+        let classMaxScores = [];
+        let classAvgScores = [];
+        let gradeMaxScores = [];
+        let gradeAvgScores = [];
         let gradeRanks = [];
         for (const [examId, examDetail] of Object.entries(this.examDetailByPerson)) {
             if (subjectId in examDetail) {
@@ -353,9 +369,16 @@ class PersonPage {
                 labels.push(this.examIdToName[examId]);
                 scores.push(examDetail[subjectId][0]);
                 gradeRanks.push(examDetail[subjectId][2]);
+                classMaxScores.push(examDetail[subjectId][3]);
+                classAvgScores.push(examDetail[subjectId][4]);
+                gradeMaxScores.push(examDetail[subjectId][5]);
+                gradeAvgScores.push(examDetail[subjectId][6]);
             }
 
         }
+
+        let minScore = Math.max(Math.min(...scores, ...classAvgScores, ...gradeAvgScores) - 10, 0);
+        let maxScore = subjectFullScore[subjectId];
 
 
         new Chart(scoreCanvas, {
@@ -368,8 +391,44 @@ class PersonPage {
                         data: scores,
                         borderColor: "#007bff",
                         fill: false
+                    },
+                    {
+                        label: "班级平均分",
+                        data: classAvgScores,
+                        borderColor: "#6c25be",
+                        fill: false,
+                        hidden: true,
+                        borderDash: [5, 5] // Make this line dashed
+                    },
+                    {
+                        label: "班级最高分",
+                        data: classMaxScores,
+                        borderColor: "#D716D9",
+                        fill: false,
+                        hidden: true
+                    },
+                    {
+                        label: "年级平均分",
+                        data: gradeAvgScores,
+                        borderColor: "#bea925",
+                        fill: false,
+                        borderDash: [5, 5] // Make this line dashed
+                    },
+                    {
+                        label: "年级最高分",
+                        data: gradeMaxScores,
+                        borderColor: "#DF7F10",
+                        fill: false
                     }
                 ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        min: minScore,
+                        max: maxScore
+                    }
+                }
             }
         }
         );
@@ -429,7 +488,7 @@ class PersonPage {
             this.updateValidExamList(this.studentNameToId[studentSelection.value]).then(() => {
                 this.getExamDetailByPerson(this.studentNameToId[studentSelection.value]).then(() => {
                     this.updateStudentScoreTable(this.studentNameToId[studentSelection.value], examSelection.value);
-                    this.drawChart(1);
+                    this.drawChart(255);
                     submitButton.disabled = false;
                     submitButton.textContent = "查询";
                 });

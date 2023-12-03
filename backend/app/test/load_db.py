@@ -42,21 +42,6 @@ semester_to_id ={
     "高三下": 6
 }
 
-# cur.execute("DROP PROCEDURE IF EXISTS DropIndexIfExists")
-# Delete the procedure if it exists, avoiding error
-cur.execute("""
-CREATE PROCEDURE DropIndexIfExists(IN tableName VARCHAR(64), IN indexName VARCHAR(64))
-BEGIN
-    IF EXISTS (SELECT NULL FROM INFORMATION_SCHEMA.STATISTICS WHERE table_name = tableName AND index_name = indexName)
-    THEN
-        SET @s = CONCAT('ALTER TABLE ', tableName, ' DROP INDEX ', indexName);
-        PREPARE stmt FROM @s;
-        EXECUTE stmt;
-        DEALLOCATE PREPARE stmt;
-    END IF;
-END
-""")
-
 cur.execute("TRUNCATE TABLE scores")
 cur.execute("TRUNCATE TABLE students")
 cur.execute("TRUNCATE TABLE exams")
