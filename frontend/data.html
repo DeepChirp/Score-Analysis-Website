@@ -53,15 +53,21 @@
             </div>
             <div class="data-download-div">
                 <h3>考试数据下载</h3>
-                <label for="grade-selection">年级</label>
-                <select id="grade-selection">
-                    <option>Loading...</option>
-                </select>
-                <label for="exam-selection">考试</label>
-                <select id="exam-selection">
-                    <option>Loading...</option>
-                </select>
-                <button id="download-submit" disabled>下载</button>
+                <div class="styled-select-div">
+                    <label for="grade-selection">年级</label>
+                    <select id="grade-selection" class="styled-select">
+                        <option>Loading...</option>
+                    </select>
+                </div>
+                <div class="styled-select-div">
+                    <label for="exam-selection">考试</label>
+                    <select id="exam-selection" class="styled-select">
+                        <option>Loading...</option>
+                    </select>
+                </div>
+                <div class="download-button-div">
+                    <button id="download-submit" disabled>下载</button>
+                </div>
             </div>
         </div>
     </div>
