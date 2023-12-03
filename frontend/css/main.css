@@ -5,9 +5,22 @@ body {
     display: flex;
     flex-direction: column;
     background-color: #f8f8f8;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    margin-bottom: 20px;
 }
 
 .main-content {
+    padding: 20px;
+    background-color: #f8f9fa;
     flex-grow: 1;
     margin-right: 1em;
     margin-left: 1em;
@@ -23,4 +36,13 @@ h1 {
 
 tr {
     text-align: center;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.title h1 {
+    color: #007bff;
 }

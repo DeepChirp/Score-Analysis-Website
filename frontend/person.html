@@ -43,48 +43,59 @@
             </div>
             <div class="content">
                 <div class="student-selection-div">
-                    <label for="grade-selection">年级</label>
-                    <select id="grade-selection">
-                        <option>Loading...</option>
-                    </select>
-                    <label for="exam-selection">考试</label>
-                    <select id="exam-selection">
-                        <option>Loading...</option>
-                    </select>
-                    <label for="class-selection">班级</label>
-                    <select id="class-selection">
-                        <option>Loading...</option>
-                    </select>
-                    <label for="student-selection">学生</label>
-                    <input id="student-selection" list="student-list">
-                    <datalist id="student-list">
-                        <option>Loading...</option>
-                    </datalist>
-                    <button id="student-submit" disabled>查询</button>
+                    <div class="select-group">
+                        <label for="grade-selection">年级</label>
+                        <select id="grade-selection">
+                            <!-- options -->
+                        </select>
+                    </div>
+                    <div class="select-group">
+                        <label for="exam-selection">考试</label>
+                        <select id="exam-selection">
+                            <!-- options -->
+                        </select>
+                    </div>
+                    <div class="select-group">
+                        <label for="class-selection">班级</label>
+                        <select id="class-selection">
+                            <!-- options -->
+                        </select>
+                    </div>
+                    <div class="select-group">
+                        <label for="student-selection">学生</label>
+                        <input id="student-selection" list="student-list">
+                        <datalist id="student-list">
+                            <!-- options -->
+                        </datalist>
+                    </div>
                 </div>
-                <div class="student-score-table-div">
-                    <table class="student-score-table" border="1" width=100% cellpadding="10" rules="all">
-                        <caption><b>个人成绩<br></b>
-                            <!--红色通常与警告或者危险相关联，而绿色与安全或者正面的变化相关联-->
-                            <b class="student-score-table-note">注：排名中括号内容表示排名升降：“-”代表退步，以红色标识；“+”表示进步，以绿色标识</b>
-                        </caption>
-                        <thead>
-                            <tr>
-                                <th>科目</th>
-                                <th>分数</th>
-                                <th>平均分（班级/年级）</th>
-                                <th>最高分（班级/年级）</th>
-                                <th>班级排名</th>
-                                <th>年级排名</th>
-                                <th>参考人数（班级/年级）</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <div class="button-group">
+                    <button id="student-submit">查询</button>
+                </div>
+            </div>
+            <div class="student-score-table-div">
+                <table class="student-score-table" border="1" width=100% cellpadding="10" rules="all">
+                    <caption><b>个人成绩<br></b>
+                        <!--红色通常与警告或者危险相关联，而绿色与安全或者正面的变化相关联-->
+                        <b class="student-score-table-note">注：排名中括号内容表示排名升降：“-”代表退步，以红色标识；“+”表示进步，以绿色标识</b>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th>科目</th>
+                            <th>分数</th>
+                            <th>平均分（班级/年级）</th>
+                            <th>最高分（班级/年级）</th>
+                            <th>班级排名</th>
+                            <th>年级排名</th>
+                            <th>参考人数（班级/年级）</th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-                        </tbody>
-                    </table>
-                </div>
-                <!--
+                    </tbody>
+                </table>
+            </div>
+            <!--
                     TODO: 个人成绩分析图表
                 <div id="student-score-overview-chart-container">
                     <div id="chart-container-title">
@@ -93,15 +104,15 @@
                     <div id="student-score-overview-chart-div"></div>
                 </div>
                 -->
-                <div id="student-score-chart-container">
-                    <div id="chart-container-title">
-                        <span>各科分数及排名</span>
-                    </div>
-                    <div id="student-score-chart-select-div"></div>
-                    <div id="student-score-chart-div"></div>
+            <div id="student-score-chart-container">
+                <div id="chart-container-title">
+                    <span>各科分数及排名</span>
                 </div>
+                <div id="student-score-chart-select-div"></div>
+                <div id="student-score-chart-div"></div>
             </div>
         </div>
+    </div>
     </div>
     <div id="footer"></div>
 </body>
