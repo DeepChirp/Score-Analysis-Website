@@ -145,7 +145,10 @@ function loadPageContent(url) {
             navButton.classList.add('active');
         }
 
-        // 从加载的内容中提取 <link> 元素
+        // 获取所有当前页面的<link>元素
+        var oldLinks = Array.from(document.getElementsByTagName('link'));
+
+        // 从加载的内容中提取<link>元素
         $data.filter('link[rel="stylesheet"]').add($data.find('link[rel="stylesheet"]')).each(function () {
             var cssHref = this.href;
 
@@ -155,13 +158,20 @@ function loadPageContent(url) {
             });
 
             if (!isCssLoaded) {
-                // 创建一个新的 <link> 元素并设置其 href 属性为CSS文件的URL
+                // 创建一个新的<link>元素并设置其href属性为CSS文件的URL
                 var link = document.createElement('link');
                 link.rel = 'stylesheet';
                 link.href = cssHref;
 
-                // 将新的 <link> 元素添加到 <head> 元素中
+                // 将新的<link>元素添加到<head>元素中
                 document.head.appendChild(link);
+            }
+        });
+
+        // 移除旧的<link>元素
+        oldLinks.forEach(function (link) {
+            if (!link.href.includes('navbar.css') && !link.href.includes('footer.css') && !link.href.includes('main.css')) {
+                link.parentNode.removeChild(link);
             }
         });
 
