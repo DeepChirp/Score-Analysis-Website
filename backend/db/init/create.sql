@@ -37,6 +37,12 @@ CREATE TABLE grades (
     name VARCHAR(64) NOT NULL
 );
 
+CREATE TABLE uploads (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    unique_id BIGINT UNSIGNED,
+    filename VARCHAR(255)
+);
+
 CREATE INDEX idx_student_id ON scores (student_id);
 CREATE INDEX idx_exam_id ON scores (exam_id);
 CREATE INDEX idx_class ON students (class);
