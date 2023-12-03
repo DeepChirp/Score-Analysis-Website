@@ -441,7 +441,7 @@ class PersonPage {
             this.updateValidExamList(this.studentNameToId[studentSelection.value]).then(() => {
                 this.getExamDetailByPerson(this.studentNameToId[studentSelection.value]).then(() => {
                     this.updateStudentScoreTable(this.studentNameToId[studentSelection.value], examSelection.value);
-                    this.drawChart(1);
+                    this.drawChart(255);
                     submitButton.disabled = false;
                     submitButton.textContent = "查询";
                 });
