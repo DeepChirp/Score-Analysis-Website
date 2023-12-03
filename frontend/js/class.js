@@ -232,10 +232,6 @@ class ClassPage {
         this.doGetClassAnalysisBySubject(classId, subjectId).then((data) => {
             if (data["code"] === 200) {
 
-                const htitle = document.createElement("h3");
-                htitle.textContent = subjectIdToName[subjectId];
-                subjectChartDiv.appendChild(htitle);
-
                 const classTotalContainer = document.createElement("div");
                 classTotalContainer.setAttribute("class", "total-chart-container");
 
