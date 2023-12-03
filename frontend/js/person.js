@@ -393,13 +393,15 @@ class PersonPage {
                         label: "班级平均分",
                         data: classAvgScores,
                         borderColor: "#6c25be",
-                        fill: false
+                        fill: false,
+                        hidden: true
                     },
                     {
                         label: "班级最高分",
                         data: classMaxScores,
                         borderColor: "#D716D9",
-                        fill: false
+                        fill: false,
+                        hidden: true
                     },
                     {
                         label: "年级平均分",
