@@ -42,6 +42,10 @@ semester_to_id ={
     "高三下": 6
 }
 
+student_name_black_list = [
+    "罗文烨"
+]
+
 cur.execute("TRUNCATE TABLE scores")
 cur.execute("TRUNCATE TABLE students")
 cur.execute("TRUNCATE TABLE exams")
@@ -63,14 +67,16 @@ with open("../data/old_student_class", "r") as f:
     old_student_class = json.loads(f.read())
     class_sql = "INSERT INTO students (class, class_divide, grade_id, name) VALUES (?, 0, ?, ?)"
     for name, class_id in old_student_class.items():
-        cur.execute(class_sql, (class_id, grades_name_to_id["本高2023届"], name))
+        if name not in student_name_black_list:
+            cur.execute(class_sql, (class_id, grades_name_to_id["本高2023届"], name))
 
 
 with open("../data/new_student_class", "r") as f:
     new_student_class = json.loads(f.read())
     class_sql = "INSERT INTO students (class, class_divide, grade_id, name) VALUES (?, 1, ?, ?)"
     for name, class_id in new_student_class.items():
-        cur.execute(class_sql, (class_id, grades_name_to_id["本高2023届"], name))
+        if name not in student_name_black_list:
+            cur.execute(class_sql, (class_id, grades_name_to_id["本高2023届"], name))
 
 for subject_name, subject_info in subjects_to_id.items():
     subject_sql = "INSERT INTO subjects (full_score, name) VALUES (?, ?)"
@@ -95,82 +101,82 @@ for filename in filename_list:
         print("../data/csv/{}".format(filename))
         for row in csv_reader:
             grade_name, class_id, student_name, chinese, math, english, physics, chemistry, biology, politic, history, geography = row
+            if student_name not in student_name_black_list:
+                if grade_name == "年级":
+                    continue
 
-            if grade_name == "年级":
-                continue
-
-            if grade_name in grades_name_to_id:
-                grade_id = grades_name_to_id[grade_name]
-            else:
-                grades_sql = "INSERT INTO grades (name) VALUES (?)"
-                cur.execute(grades_sql, (grade_name, ))
-                conn.commit()
-                grades_id_sql = "SELECT id FROM grades WHERE name = ?"
-                cur.execute(grades_id_sql, (grade_name, ))
-                grade_id = list(cur)[0][0]
-                grades_name_to_id[grade_name] = grade_id
-
-            if student_name in student_to_id:
-                student_id = student_to_id[student_name]
-            else:
-                id_sql = "SELECT id FROM students WHERE name = ?"
-                cur.execute(id_sql, (student_name, ))
-                print(student_name)
-                data = list(cur)
-                if len(data) != 0 and data[0][0] is not None:
-                    student_id = data[0][0]
-                    student_to_id[student_name] = student_id
+                if grade_name in grades_name_to_id:
+                    grade_id = grades_name_to_id[grade_name]
                 else:
-                    isql = "INSERT INTO students (class, name, class_divide, grade_id) VALUES (?, ?, ?, ?)"
-                    if class_id.strip() == "":
-                        class_id = "17班"
-                    cur.execute(isql, (int(class_id[:-1]), student_name, 0, grade_id))
+                    grades_sql = "INSERT INTO grades (name) VALUES (?)"
+                    cur.execute(grades_sql, (grade_name, ))
                     conn.commit()
+                    grades_id_sql = "SELECT id FROM grades WHERE name = ?"
+                    cur.execute(grades_id_sql, (grade_name, ))
+                    grade_id = list(cur)[0][0]
+                    grades_name_to_id[grade_name] = grade_id
+
+                if student_name in student_to_id:
+                    student_id = student_to_id[student_name]
+                else:
                     id_sql = "SELECT id FROM students WHERE name = ?"
-                    cur.execute(id_sql, (student_name,))
+                    cur.execute(id_sql, (student_name, ))
+                    print(student_name)
                     data = list(cur)
-                    student_id = data[0][0]
+                    if len(data) != 0 and data[0][0] is not None:
+                        student_id = data[0][0]
+                        student_to_id[student_name] = student_id
+                    else:
+                        isql = "INSERT INTO students (class, name, class_divide, grade_id) VALUES (?, ?, ?, ?)"
+                        if class_id.strip() == "":
+                            class_id = "17班"
+                        cur.execute(isql, (int(class_id[:-1]), student_name, 0, grade_id))
+                        conn.commit()
+                        id_sql = "SELECT id FROM students WHERE name = ?"
+                        cur.execute(id_sql, (student_name,))
+                        data = list(cur)
+                        student_id = data[0][0]
 
-            exam_saved_name = "{}_{}".format(semester_name, exam_name)
-            if exam_saved_name in exams_to_id:
-                exam_id = exams_to_id[exam_saved_name]
-            else:
-                exams_sql = "INSERT INTO exams (name) VALUES (?)"
-                cur.execute(exams_sql, (exam_saved_name, ))
-                conn.commit()
-                exams_id_sql = "SELECT id FROM exams WHERE name = ?"
-                cur.execute(exams_id_sql, (exam_saved_name, ))
-                exam_id = list(cur)[0][0]
-                exams_to_id[exam_saved_name] = exam_id
+                exam_saved_name = "{}_{}".format(semester_name, exam_name)
+                if exam_saved_name in exams_to_id:
+                    exam_id = exams_to_id[exam_saved_name]
+                else:
+                    exams_sql = "INSERT INTO exams (name) VALUES (?)"
+                    cur.execute(exams_sql, (exam_saved_name, ))
+                    conn.commit()
+                    exams_id_sql = "SELECT id FROM exams WHERE name = ?"
+                    cur.execute(exams_id_sql, (exam_saved_name, ))
+                    exam_id = list(cur)[0][0]
+                    exams_to_id[exam_saved_name] = exam_id
 
-            semester_id = semester_to_id[semester_name]
-            if chinese.strip() != "/":
-                chinese_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(chinese_sql, (student_id, exam_id, 1, semester_id, float(chinese)))
-            if math.strip() != "/":
-                math_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(math_sql, (student_id, exam_id, 2, semester_id, float(math)))
-            if english.strip() != "/":
-                english_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(english_sql, (student_id, exam_id, 3, semester_id, float(english)))
-            if physics.strip() != "/":
-                physics_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(physics_sql, (student_id, exam_id, 4, semester_id, float(physics)))
-            if chemistry.strip() != "/":
-                chemistry_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(chemistry_sql, (student_id, exam_id, 5, semester_id, float(chemistry)))
-            if biology.strip() != "/":
-                biology_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(biology_sql, (student_id, exam_id, 6, semester_id, float(biology)))
-            if politic.strip() != "/":
-                politic_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(politic_sql, (student_id, exam_id, 7, semester_id, float(politic)))
-            if history.strip() != "/":
-                history_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(history_sql, (student_id, exam_id, 8, semester_id, float(history)))
-            if geography.strip() != "/":
-                geography_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
-                cur.execute(geography_sql, (student_id, exam_id, 9, semester_id, float(geography)))
+                semester_id = semester_to_id[semester_name]
+                if chinese.strip() != "/":
+                    chinese_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                    cur.execute(chinese_sql, (student_id, exam_id, 1, semester_id, float(chinese)))
+                if math.strip() != "/":
+                    math_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                    cur.execute(math_sql, (student_id, exam_id, 2, semester_id, float(math)))
+                if english.strip() != "/":
+                    english_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                    cur.execute(english_sql, (student_id, exam_id, 3, semester_id, float(english)))
+                if physics.strip() != "/":
+                    physics_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                    cur.execute(physics_sql, (student_id, exam_id, 4, semester_id, float(physics)))
+                if chemistry.strip() != "/":
+                    chemistry_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                    cur.execute(chemistry_sql, (student_id, exam_id, 5, semester_id, float(chemistry)))
+                if biology.strip() != "/":
+                    biology_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                    cur.execute(biology_sql, (student_id, exam_id, 6, semester_id, float(biology)))
+                if politic.strip() != "/":
+                    politic_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                    cur.execute(politic_sql, (student_id, exam_id, 7, semester_id, float(politic)))
+                if history.strip() != "/":
+                    history_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                    cur.execute(history_sql, (student_id, exam_id, 8, semester_id, float(history)))
+                if geography.strip() != "/":
+                    geography_sql = "INSERT INTO scores (student_id, exam_id, subject_id, semester_id, value) VALUES (?, ?, ?, ?, ?)"
+                    cur.execute(geography_sql, (student_id, exam_id, 9, semester_id, float(geography)))
 
 
 cur.execute("CREATE INDEX idx_student_id ON scores (student_id)")
