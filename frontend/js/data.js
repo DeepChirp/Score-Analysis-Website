@@ -145,6 +145,15 @@ class DataPage {
                 fetch: null
             }
         });
+        pond.labelIdle = '将文件拖动到此处或 <span class="filepond--label-action"> 浏览本地文件 </span>';
+        pond.labelFileLoading = '加载中...';
+        pond.labelFileLoadError = '加载失败';
+        pond.labelFileProcessing = '正在上传...';
+        pond.labelFileProcessingComplete = '上传成功';
+        pond.labelFileProcessingAborted = '已取消上传';
+        pond.labelFileProcessingError = '上传失败';
+        pond.labelTapToCancel = '点按取消';
+        pond.labelTapToRetry = '点按重试';
         const gradeSelection = document.querySelector("#grade-selection");
         gradeSelection.addEventListener("change", (event) => {
             this.updateExamList(event.target.value);
