@@ -227,6 +227,7 @@ class PersonPage {
             const chartSelectDiv = document.querySelector("#student-score-chart-select-div");
 
             // Show the chart select div
+            document.getElementById('student-score-overview-container').style.display = 'block';
             document.getElementById('student-score-overview-chart-container').style.display = 'block';
             document.getElementById('student-score-chart-container').style.display = 'block';
 
@@ -270,7 +271,7 @@ class PersonPage {
                             "rank": gradeRank / scoresList[subjectId][8]
                         });
                     }
-                    
+
                     if (lastExamId != -1) {
                         let lastClassRank = this.examDetailByPerson[lastExamId][subjectId][1];
                         let lastGradeRank = this.examDetailByPerson[lastExamId][subjectId][2];
@@ -284,7 +285,7 @@ class PersonPage {
                                 "deltaRank": deltaGradeRank / scoresList[subjectId][8]
                             });
                         }
-                        
+
                     }
                     else {
                         classRankTd.textContent = classRank;
@@ -307,7 +308,7 @@ class PersonPage {
                     });
                     chartSelectDiv.appendChild(thisBtn);
                 }
-                
+
             }
             subjectArray.sort(this.subjectCmp);
             deltaSubjectArray.sort(this.deltaSubjectCmp);
@@ -332,7 +333,7 @@ class PersonPage {
                 let worseCount = 0;
                 let betterList = [];
                 let worseList = [];
-                
+
                 for (const deltaSubject of deltaSubjectArray) {
                     if (deltaSubject["deltaRank"] > 0.05) {
                         betterList.push(deltaSubject["name"]);

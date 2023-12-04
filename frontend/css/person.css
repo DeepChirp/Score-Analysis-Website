@@ -105,6 +105,7 @@ tbody tr:nth-child(odd) {
     background-color: #ffffff;
 }
 
+#student-score-overview-container,
 #student-score-chart-container,
 #student-score-overview-chart-container {
     display: none;
@@ -117,6 +118,7 @@ tbody tr:nth-child(odd) {
     margin-bottom: 20px;
 }
 
+#overview-container-title,
 #chart-container-title {
     color: #262729;
     font-size: 1.25em;
@@ -127,6 +129,18 @@ tbody tr:nth-child(odd) {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
     overflow: hidden;
+}
+
+#student-score-overview-analysis {
+    font-size: 16px;
+    color: #333;
+    line-height: 1.5;
+    margin: 10px 0;
+}
+
+#student-score-overview-analysis span {
+    font-weight: bold;
+    color: #007bff;
 }
 
 .chart-note {
