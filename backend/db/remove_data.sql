@@ -4,3 +4,4 @@ TRUNCATE TABLE exams;
 TRUNCATE TABLE subjects;
 TRUNCATE TABLE semesters;
 TRUNCATE TABLE grades;
+TRUNCATE TABLE uploads;
