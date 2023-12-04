@@ -192,8 +192,8 @@ class PersonPage {
         }
     }
     async updateStudentScoreTable(studentId, examId) {
-        let data = await(this.doGetPersonData(studentId, examId));
-        
+        let data = await (this.doGetPersonData(studentId, examId));
+
         if (data["code"] === 200) {
             const scoreTbody = document.querySelector(".student-score-table tbody");
             while (scoreTbody.firstChild) {
@@ -206,6 +206,7 @@ class PersonPage {
             const chartSelectDiv = document.querySelector("#student-score-chart-select-div");
 
             // Show the chart select div
+            document.getElementById('student-score-overview-chart-container').style.display = 'block';
             document.getElementById('student-score-chart-container').style.display = 'block';
 
             while (chartSelectDiv.firstChild) {
@@ -291,7 +292,7 @@ class PersonPage {
         } else {
             // TODO: Show error message if request failed?
         }
-        
+
     }
     async doGetExamListByPerson(studentId) {
         let response = await fetch(`${protocolPrefix}${host}/api/scores/data/by_person/${studentId}/exam`);
@@ -483,19 +484,19 @@ class PersonPage {
         }
         let showLst = [];
         let labels = [];
-        
+
         for (const [subjectId, subjectName] of Object.entries(subjectIdToName)) {
-            if (subjectId in this.personScoresList) {
-                showLst.push(this.personScoresList[subjectId][0] / this.personScoresList[subjectId][6] * 100);
+            if (subjectId in this.personScoresList && subjectId != 255) {
+                showLst.push((1 - ((this.personScoresList[subjectId][1] - 1) / (this.personScoresList[subjectId][5] - 1))) * 100);
                 labels.push(subjectName);
             }
         }
-        const minR = Math.min(...showLst) >= 60 ? 60 : Math.min(...showLst);
+
         new Chart(overallChartCanvas, {
             type: "radar",
-            data : {
+            data: {
                 labels: labels,
-                datasets:[
+                datasets: [
                     {
                         label: "发挥水平",
                         data: showLst,
@@ -507,12 +508,14 @@ class PersonPage {
             options: {
                 scales: {
                     r: {
-                        min: minR,
-                        max: Math.max(...showLst)
+                        ticks: {
+                            display: false
+                        },
+                        min: 0,
+                        max: 100
                     }
                 }
             }
-            
         });
         overallChartDiv.appendChild(overallChartCanvas);
     }

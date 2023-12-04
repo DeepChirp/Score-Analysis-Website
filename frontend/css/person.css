@@ -105,7 +105,8 @@ tbody tr:nth-child(odd) {
     background-color: #ffffff;
 }
 
-#student-score-chart-container {
+#student-score-chart-container,
+#student-score-overview-chart-container {
     display: none;
     margin-top: 5em;
     margin-bottom: 5em;
@@ -126,6 +127,12 @@ tbody tr:nth-child(odd) {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
     overflow: hidden;
+}
+
+.chart-note {
+    font-size: 14px;
+    color: #666;
+    margin-top: 10px;
 }
 
 #student-score-chart-select-div {
