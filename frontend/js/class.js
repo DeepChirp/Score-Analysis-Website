@@ -199,14 +199,27 @@ class ClassPage {
 
                 analysisTableBody.appendChild(thisTr);
 
-                const thisBtn = document.createElement("button");
-                thisBtn.textContent = subjectIdToName[subjectId];
-                thisBtn.addEventListener("click", () => {
-                    this.showClassAnalysisBySubject(classId, subjectId, thisBtn);
-                });
-                subjectSelectionDiv.appendChild(thisBtn);
+                
             }
-            this.showClassAnalysisBySubject(classId, 1, subjectSelectionDiv.firstChild);
+
+            const totalBtn = document.createElement("button");
+            totalBtn.textContent = "总分";
+            totalBtn.addEventListener("click", () => {
+                this.showClassAnalysisBySubject(classId, 255, totalBtn);
+            });
+            subjectSelectionDiv.appendChild(totalBtn);
+
+            for (const subjectId of Object.keys(analysisResult)) {
+                if (subjectId != 255) {
+                    const thisBtn = document.createElement("button");
+                    thisBtn.textContent = subjectIdToName[subjectId];
+                    thisBtn.addEventListener("click", () => {
+                    this.showClassAnalysisBySubject(classId, subjectId, thisBtn);
+                    });
+                    subjectSelectionDiv.appendChild(thisBtn);
+                }
+            }
+            this.showClassAnalysisBySubject(classId, 255, totalBtn);
         }
         else {
             // TODO: Show error message if request failed?
