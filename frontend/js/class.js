@@ -513,9 +513,6 @@ class ClassPage {
 
                 }
                 );
-                console.log(classStdLst);
-                console.log(firstTenStdLst)
-                console.log(lastTenStdLst);
                 subjectChartDiv.appendChild(classTotalContainer);
                 subjectChartDiv.appendChild(classFirstTenContainer);
                 subjectChartDiv.appendChild(classLastTenContainer);
