@@ -172,3 +172,15 @@ tbody tr:nth-child(odd) {
     height: 30%;
     width: 30%;
 }
+
+#student-score-overview-analysis {
+    display: none;
+}
+
+#better-div {
+    display: none;
+}
+
+#worse-div {
+    display: none;
+}
