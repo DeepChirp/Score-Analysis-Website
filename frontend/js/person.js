@@ -9,6 +9,8 @@ class PersonPage {
         this.validExamList = [];
         this.examDetailByPerson = {};
         this.examIdToName = {};
+        this.overallData = {};
+        this.personScoresList = [];
     }
     async doGetExamInfo() {
         let response = await fetch(`${protocolPrefix}${host}/api/scores/basic_info/exam`);
@@ -189,105 +191,107 @@ class PersonPage {
             });
         }
     }
-    updateStudentScoreTable(studentId, examId) {
-        this.doGetPersonData(studentId, examId).then((data) => {
-            if (data["code"] === 200) {
-                const scoreTbody = document.querySelector(".student-score-table tbody");
-                while (scoreTbody.firstChild) {
-                    scoreTbody.removeChild(scoreTbody.firstChild);
-                }
-                let scoresList = data["data"]["scores"];
-                let lastExamId = this.getLastValidExamId(examId);
-
-                const chartSelectDiv = document.querySelector("#student-score-chart-select-div");
-
-                // Show the chart select div
-                document.getElementById('student-score-chart-container').style.display = 'block';
-
-                while (chartSelectDiv.firstChild) {
-                    chartSelectDiv.removeChild(chartSelectDiv.firstChild);
-                }
-
-                let showLst = Object.keys(subjectIdToName);
-                showLst.splice(showLst.indexOf(255), 1);
-                showLst.unshift(255);
-                for (const [subjectId, subjectName] of Object.entries(subjectIdToName)) {
-                    if (subjectId in scoresList) {
-                        let score = scoresList[subjectId][0];
-                        let classRank = scoresList[subjectId][1];
-                        let gradeRank = scoresList[subjectId][2];
-                        const thisTr = document.createElement("tr");
-                        const subjectNameTd = document.createElement("td");
-                        subjectNameTd.textContent = subjectName;
-                        thisTr.appendChild(subjectNameTd);
-                        const scoreTd = document.createElement("td");
-                        scoreTd.textContent = score;
-                        thisTr.appendChild(scoreTd);
-                        const avgScoreTd = document.createElement("td");
-                        avgScoreTd.textContent = `${scoresList[subjectId][4].toFixed(1)}/${scoresList[subjectId][7].toFixed(1)}`;
-                        thisTr.append(avgScoreTd);
-                        const maxScoreTd = document.createElement("td");
-                        maxScoreTd.textContent = `${scoresList[subjectId][3]}/${scoresList[subjectId][6]}`;
-                        thisTr.append(maxScoreTd);
-                        const totalTd = document.createElement("td");
-                        const classRankTd = document.createElement("td");
-                        const gradeRankTd = document.createElement("td");
-                        if (lastExamId != -1) {
-                            let lastClassRank = this.examDetailByPerson[lastExamId][subjectId][1];
-                            let lastGradeRank = this.examDetailByPerson[lastExamId][subjectId][2];
-                            let deltaClassRank = lastClassRank - classRank;
-                            let deltaGradeRank = lastGradeRank - gradeRank;
-                            classRankTd.innerHTML = `${classRank} <span style="color: ${deltaClassRank < 0 ? 'red' : 'green'}">(${deltaClassRank >= 0 ? '+' : ''}${deltaClassRank})</span>`;
-                            gradeRankTd.innerHTML = `${gradeRank} <span style="color: ${deltaGradeRank < 0 ? 'red' : 'green'}">(${deltaGradeRank >= 0 ? '+' : ''}${deltaGradeRank})</span>`;
-                        }
-                        else {
-                            classRankTd.textContent = classRank;
-                            gradeRankTd.textContent = gradeRank;
-                        }
-                        thisTr.appendChild(classRankTd);
-                        thisTr.appendChild(gradeRankTd);
-                        totalTd.textContent = `${scoresList[subjectId][5]}/${scoresList[subjectId][8]}`;
-                        thisTr.append(totalTd);
-                        scoreTbody.appendChild(thisTr);
-                    }
-                }
-                for (const subjectId of showLst) {
-                    if (subjectId in scoresList) {
-                        const thisBtn = document.createElement("button");
-                        thisBtn.textContent = subjectIdToName[subjectId];
-                        thisBtn.classList.add("subject-button");
-                        thisBtn.addEventListener("click", () => {
-                            this.drawChart(subjectId);
-                        });
-                        chartSelectDiv.appendChild(thisBtn);
-                    }
-                }
-
-
-                // Add selected class to the selected button
-                var buttons = document.querySelectorAll('.subject-button');
-                buttons.forEach(function (button) {
-                    button.addEventListener('click', function () {
-                        buttons.forEach(function (btn) {
-                            btn.classList.remove('selected');
-                            btn.disabled = false; // enable all buttons
-                        });
-                        button.classList.add('selected');
-                        button.disabled = true; // disable the selected button
-                    });
-                });
-
-                for (const btn of buttons) {
-                    if (btn.textContent === "总分") {
-                        btn.classList.add("selected");
-                        btn.disabled = true;
-                    }
-                }
-
-            } else {
-                // TODO: Show error message if request failed?
+    async updateStudentScoreTable(studentId, examId) {
+        let data = await(this.doGetPersonData(studentId, examId));
+        
+        if (data["code"] === 200) {
+            const scoreTbody = document.querySelector(".student-score-table tbody");
+            while (scoreTbody.firstChild) {
+                scoreTbody.removeChild(scoreTbody.firstChild);
             }
-        });
+            let scoresList = data["data"]["scores"];
+            this.personScoresList = scoresList;
+            let lastExamId = this.getLastValidExamId(examId);
+
+            const chartSelectDiv = document.querySelector("#student-score-chart-select-div");
+
+            // Show the chart select div
+            document.getElementById('student-score-chart-container').style.display = 'block';
+
+            while (chartSelectDiv.firstChild) {
+                chartSelectDiv.removeChild(chartSelectDiv.firstChild);
+            }
+
+            let showLst = Object.keys(subjectIdToName);
+            showLst.splice(showLst.indexOf(255), 1);
+            showLst.unshift(255);
+            for (const [subjectId, subjectName] of Object.entries(subjectIdToName)) {
+                if (subjectId in scoresList) {
+                    let score = scoresList[subjectId][0];
+                    let classRank = scoresList[subjectId][1];
+                    let gradeRank = scoresList[subjectId][2];
+                    const thisTr = document.createElement("tr");
+                    const subjectNameTd = document.createElement("td");
+                    subjectNameTd.textContent = subjectName;
+                    thisTr.appendChild(subjectNameTd);
+                    const scoreTd = document.createElement("td");
+                    scoreTd.textContent = score;
+                    thisTr.appendChild(scoreTd);
+                    const avgScoreTd = document.createElement("td");
+                    avgScoreTd.textContent = `${scoresList[subjectId][4].toFixed(1)}/${scoresList[subjectId][7].toFixed(1)}`;
+                    thisTr.append(avgScoreTd);
+                    const maxScoreTd = document.createElement("td");
+                    maxScoreTd.textContent = `${scoresList[subjectId][3]}/${scoresList[subjectId][6]}`;
+                    thisTr.append(maxScoreTd);
+                    const totalTd = document.createElement("td");
+                    const classRankTd = document.createElement("td");
+                    const gradeRankTd = document.createElement("td");
+                    if (lastExamId != -1) {
+                        let lastClassRank = this.examDetailByPerson[lastExamId][subjectId][1];
+                        let lastGradeRank = this.examDetailByPerson[lastExamId][subjectId][2];
+                        let deltaClassRank = lastClassRank - classRank;
+                        let deltaGradeRank = lastGradeRank - gradeRank;
+                        classRankTd.innerHTML = `${classRank} <span style="color: ${deltaClassRank < 0 ? 'red' : 'green'}">(${deltaClassRank >= 0 ? '+' : ''}${deltaClassRank})</span>`;
+                        gradeRankTd.innerHTML = `${gradeRank} <span style="color: ${deltaGradeRank < 0 ? 'red' : 'green'}">(${deltaGradeRank >= 0 ? '+' : ''}${deltaGradeRank})</span>`;
+                    }
+                    else {
+                        classRankTd.textContent = classRank;
+                        gradeRankTd.textContent = gradeRank;
+                    }
+                    thisTr.appendChild(classRankTd);
+                    thisTr.appendChild(gradeRankTd);
+                    totalTd.textContent = `${scoresList[subjectId][5]}/${scoresList[subjectId][8]}`;
+                    thisTr.append(totalTd);
+                    scoreTbody.appendChild(thisTr);
+                }
+            }
+            for (const subjectId of showLst) {
+                if (subjectId in scoresList) {
+                    const thisBtn = document.createElement("button");
+                    thisBtn.textContent = subjectIdToName[subjectId];
+                    thisBtn.classList.add("subject-button");
+                    thisBtn.addEventListener("click", () => {
+                        this.drawChart(subjectId);
+                    });
+                    chartSelectDiv.appendChild(thisBtn);
+                }
+            }
+
+
+            // Add selected class to the selected button
+            var buttons = document.querySelectorAll('.subject-button');
+            buttons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    buttons.forEach(function (btn) {
+                        btn.classList.remove('selected');
+                        btn.disabled = false; // enable all buttons
+                    });
+                    button.classList.add('selected');
+                    button.disabled = true; // disable the selected button
+                });
+            });
+
+            for (const btn of buttons) {
+                if (btn.textContent === "总分") {
+                    btn.classList.add("selected");
+                    btn.disabled = true;
+                }
+            }
+
+        } else {
+            // TODO: Show error message if request failed?
+        }
+        
     }
     async doGetExamListByPerson(studentId) {
         let response = await fetch(`${protocolPrefix}${host}/api/scores/data/by_person/${studentId}/exam`);
@@ -465,6 +469,54 @@ class PersonPage {
         }
     }
 
+    async doGetOverallData(examId) {
+        let response = await fetch(`${protocolPrefix}${host}/api/scores/basic_info/subject_overall_data/exam/${examId}`);
+        let data = await response.json();
+        return data;
+    }
+
+    drawOverallChart() {
+        const overallChartDiv = document.querySelector("#student-score-overview-chart-div");
+        const overallChartCanvas = document.createElement("canvas");
+        while (overallChartDiv.firstChild) {
+            overallChartDiv.removeChild(overallChartDiv.firstChild);
+        }
+        let showLst = [];
+        let labels = [];
+        
+        for (const [subjectId, subjectName] of Object.entries(subjectIdToName)) {
+            if (subjectId in this.personScoresList) {
+                showLst.push(this.personScoresList[subjectId][0] / this.personScoresList[subjectId][6] * 100);
+                labels.push(subjectName);
+            }
+        }
+        const minR = Math.min(...showLst) >= 60 ? 60 : Math.min(...showLst);
+        new Chart(overallChartCanvas, {
+            type: "radar",
+            data : {
+                labels: labels,
+                datasets:[
+                    {
+                        label: "发挥水平",
+                        data: showLst,
+                        borderColor: "#007bff",
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    r: {
+                        min: minR,
+                        max: Math.max(...showLst)
+                    }
+                }
+            }
+            
+        });
+        overallChartDiv.appendChild(overallChartCanvas);
+    }
+
     initEventListeners() {
         this.getExamInfo();
         const studentSelection = document.querySelector("#student-selection");
@@ -472,6 +524,9 @@ class PersonPage {
             if (event.target.value.trim() != "") {
                 const submitButton = document.querySelector("#student-submit");
                 submitButton.disabled = false;
+            }
+            else {
+                submitButton.disabled = true;
             }
         });
 
@@ -487,10 +542,13 @@ class PersonPage {
 
             this.updateValidExamList(this.studentNameToId[studentSelection.value]).then(() => {
                 this.getExamDetailByPerson(this.studentNameToId[studentSelection.value]).then(() => {
-                    this.updateStudentScoreTable(this.studentNameToId[studentSelection.value], examSelection.value);
-                    this.drawChart(255);
-                    submitButton.disabled = false;
-                    submitButton.textContent = "查询";
+                    this.updateStudentScoreTable(this.studentNameToId[studentSelection.value], examSelection.value).then(() => {
+                        this.drawChart(255);
+                        this.drawOverallChart();
+                        submitButton.disabled = false;
+                        submitButton.textContent = "查询";
+                    })
+
                 });
             });
         });

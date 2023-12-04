@@ -158,3 +158,10 @@ tbody tr:nth-child(odd) {
     color: #007bff;
     cursor: not-allowed;
 }
+
+#student-score-overview-chart-div {
+    position: relative;
+    margin: auto;
+    height: 30%;
+    width: 30%;
+}
