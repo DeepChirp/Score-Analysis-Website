@@ -191,9 +191,30 @@ class PersonPage {
             });
         }
     }
+
+    subjectCmp(a, b) {
+        if (a["rank"] > b["rank"]) {
+            return 1;
+        } else if (a["rank"] < b["rank"]) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
+
+    deltaSubjectCmp(a, b) {
+        if (a["deltaRank"] > b["deltaRank"]) {
+            return -1;
+        } else if (a["deltaRank"] < b["deltaRank"]) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
     async updateStudentScoreTable(studentId, examId) {
-        let data = await(this.doGetPersonData(studentId, examId));
-        
+        let data = await (this.doGetPersonData(studentId, examId));
+
         if (data["code"] === 200) {
             const scoreTbody = document.querySelector(".student-score-table tbody");
             while (scoreTbody.firstChild) {
@@ -206,6 +227,8 @@ class PersonPage {
             const chartSelectDiv = document.querySelector("#student-score-chart-select-div");
 
             // Show the chart select div
+            document.getElementById('student-score-overview-container').style.display = 'block';
+            document.getElementById('student-score-overview-chart-container').style.display = 'block';
             document.getElementById('student-score-chart-container').style.display = 'block';
 
             while (chartSelectDiv.firstChild) {
@@ -215,6 +238,12 @@ class PersonPage {
             let showLst = Object.keys(subjectIdToName);
             showLst.splice(showLst.indexOf(255), 1);
             showLst.unshift(255);
+            const bestSubjectSpan = document.querySelector("#student-score-overview-analysis-best-subject");
+            const worstSubjectSpan = document.querySelector("#student-score-overview-analysis-worst-subject");
+            const betterSubjectSpan = document.querySelector("#student-score-overview-analysis-better-subject");
+            const worseSubjectSpan = document.querySelector("#student-score-overview-analysis-worse-subject");
+            let subjectArray = [];
+            let deltaSubjectArray = [];
             for (const [subjectId, subjectName] of Object.entries(subjectIdToName)) {
                 if (subjectId in scoresList) {
                     let score = scoresList[subjectId][0];
@@ -236,6 +265,13 @@ class PersonPage {
                     const totalTd = document.createElement("td");
                     const classRankTd = document.createElement("td");
                     const gradeRankTd = document.createElement("td");
+                    if (subjectId != 255) {
+                        subjectArray.push({
+                            "name": subjectName,
+                            "rank": gradeRank / scoresList[subjectId][8]
+                        });
+                    }
+
                     if (lastExamId != -1) {
                         let lastClassRank = this.examDetailByPerson[lastExamId][subjectId][1];
                         let lastGradeRank = this.examDetailByPerson[lastExamId][subjectId][2];
@@ -243,6 +279,13 @@ class PersonPage {
                         let deltaGradeRank = lastGradeRank - gradeRank;
                         classRankTd.innerHTML = `${classRank} <span style="color: ${deltaClassRank < 0 ? 'red' : 'green'}">(${deltaClassRank >= 0 ? '+' : ''}${deltaClassRank})</span>`;
                         gradeRankTd.innerHTML = `${gradeRank} <span style="color: ${deltaGradeRank < 0 ? 'red' : 'green'}">(${deltaGradeRank >= 0 ? '+' : ''}${deltaGradeRank})</span>`;
+                        if (subjectId != 255) {
+                            deltaSubjectArray.push({
+                                "name": subjectName,
+                                "deltaRank": deltaGradeRank / scoresList[subjectId][8]
+                            });
+                        }
+
                     }
                     else {
                         classRankTd.textContent = classRank;
@@ -265,9 +308,51 @@ class PersonPage {
                     });
                     chartSelectDiv.appendChild(thisBtn);
                 }
+
             }
+            subjectArray.sort(this.subjectCmp);
+            deltaSubjectArray.sort(this.deltaSubjectCmp);
+            const betterDiv = document.querySelector("#better-div");
+            const worseDiv = document.querySelector("#worse-div");
+            betterDiv.style.display = "none";
+            worseDiv.style.display = "none";
+            let subjectNameArray = [];
+            for (const subject of subjectArray) {
+                subjectNameArray.push(subject["name"]);
+            }
+            if (subjectArray.length > 0) {
+                bestSubjectSpan.textContent = subjectNameArray.slice(0, 2).join("、");
+            }
+            if (subjectArray.length > 2) {
+                worstSubjectSpan.textContent = subjectNameArray.slice(subjectArray.length - 2, subjectArray.length).join("、");
+            }
+            const overallAnalysisDiv = document.querySelector("#student-score-overview-analysis");
+            overallAnalysisDiv.style.display = "block";
+            if (deltaSubjectArray.length > 0) {
+                let betterCount = 0;
+                let worseCount = 0;
+                let betterList = [];
+                let worseList = [];
 
+                for (const deltaSubject of deltaSubjectArray) {
+                    if (deltaSubject["deltaRank"] > 0.05) {
+                        betterList.push(deltaSubject["name"]);
+                        betterCount++;
+                    } else if (deltaSubject["deltaRank"] < -0.05) {
+                        worseList.push(deltaSubject["name"]);
+                        worseCount++;
+                    }
+                }
 
+                if (betterCount > 0) {
+                    betterDiv.style.display = "block";
+                    betterSubjectSpan.textContent = betterList.join("、");
+                }
+                if (worseCount > 0) {
+                    worseDiv.style.display = "block";
+                    worseSubjectSpan.textContent = worseList.join("、");
+                }
+            }
             // Add selected class to the selected button
             var buttons = document.querySelectorAll('.subject-button');
             buttons.forEach(function (button) {
@@ -291,7 +376,7 @@ class PersonPage {
         } else {
             // TODO: Show error message if request failed?
         }
-        
+
     }
     async doGetExamListByPerson(studentId) {
         let response = await fetch(`${protocolPrefix}${host}/api/scores/data/by_person/${studentId}/exam`);
@@ -483,19 +568,19 @@ class PersonPage {
         }
         let showLst = [];
         let labels = [];
-        
+
         for (const [subjectId, subjectName] of Object.entries(subjectIdToName)) {
-            if (subjectId in this.personScoresList) {
-                showLst.push(this.personScoresList[subjectId][0] / this.personScoresList[subjectId][6] * 100);
+            if (subjectId in this.personScoresList && subjectId != 255) {
+                showLst.push((1 - ((this.personScoresList[subjectId][1] - 1) / (this.personScoresList[subjectId][5] - 1))) * 100);
                 labels.push(subjectName);
             }
         }
-        const minR = Math.min(...showLst) >= 60 ? 60 : Math.min(...showLst);
+
         new Chart(overallChartCanvas, {
             type: "radar",
-            data : {
+            data: {
                 labels: labels,
-                datasets:[
+                datasets: [
                     {
                         label: "发挥水平",
                         data: showLst,
@@ -507,12 +592,14 @@ class PersonPage {
             options: {
                 scales: {
                     r: {
-                        min: minR,
-                        max: Math.max(...showLst)
+                        ticks: {
+                            display: false
+                        },
+                        min: 0,
+                        max: 100
                     }
                 }
             }
-            
         });
         overallChartDiv.appendChild(overallChartCanvas);
     }
