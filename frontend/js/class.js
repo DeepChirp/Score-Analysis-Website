@@ -8,6 +8,7 @@ class ClassPage {
         this.classListByExamId = {};
         this.classAnalysis = {};
         this.overallData = {};
+        this.validExamList = [];
     }
 
     async doGetExamInfo() {
@@ -231,6 +232,45 @@ class ClassPage {
         return data;
     }
 
+    async doGetValidExamList(class_id) {
+        const response = await fetch(`${protocolPrefix}${host}/api/scores/data/basic_info/by_class/${class_id}/valid_exam`);
+        return await response.json();
+    }
+
+    async updateValidExamList(class_id) {
+        const validExamList = await this.doGetValidExamList(class_id);
+        if (validExamList["code"] === 200) {
+            this.validExamList = validExamList["data"]["validExams"];
+        } else {
+            // TODO: Show error message if request failed?
+        }
+    }
+
+    getBeginValidExamIdLst(examId, count) {
+        let tempLst = this.validExamList;
+        tempLst.reverse();
+        if (tempLst.length > 0) {
+            let flag = 0;
+            let current = 0;
+            let resultLst = [];
+            for (const id of tempLst) {
+                if (id === examId) {
+                    flag = 1;
+                }
+                if (current >= count) {
+                    break;
+                }
+                if (flag) {
+                    resultLst.push(id);
+                    current ++;
+                }
+            }
+            return resultLst.reverse();
+        } else {
+            return -1;
+        }
+    }
+
     showClassAnalysisBySubject(classId, subjectId, thisBtn) {
         const subjectSelectionDiv = document.querySelector(".subject-selection-div");
         const childButtonLst = subjectSelectionDiv.children;
@@ -307,7 +347,12 @@ class ClassPage {
                 let lastTenAvgLst = [];
                 let lastTenAvgRankLst = [];
                 let lastTenStdLst = [];
-                for (const [examId, chartData] of Object.entries(data["data"]["chartData"])) {
+
+                const examSelection = document.querySelector("#exam-selection");
+                const thisExam = Number(examSelection.value);
+                const showExamLst = this.getBeginValidExamIdLst(thisExam, 10);
+                for (const examId of showExamLst) {
+                    let chartData = data["data"]["chartData"][examId];
                     labels.push(this.examIdToName[examId]);
                     classAvgLst.push(chartData["avgScore"]);
                     gradeAvgLst.push(chartData["gradeAvgScore"]);
@@ -572,13 +617,14 @@ class ClassPage {
             submitButton.textContent = "Loading...";
             submitButton.disabled = true;
             this.getValidNum();
-            this.getOverallData(examSelection.value).then(() => {
-                this.getClassAnalysis(examSelection.value, classSelection.value).then(() => {
-                    submitButton.disabled = false;
-                    submitButton.textContent = "查询";
+            this.updateValidExamList(classSelection.value).then(() => {
+                this.getOverallData(examSelection.value).then(() => {
+                    this.getClassAnalysis(examSelection.value, classSelection.value).then(() => {
+                        submitButton.disabled = false;
+                        submitButton.textContent = "查询";
+                    });
                 });
             });
-
         });
     }
 }
