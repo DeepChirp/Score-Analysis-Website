@@ -408,6 +408,31 @@ class PersonPage {
         }
     }
 
+    getBeginValidExamIdLst(examId, count) {
+        let tempLst = this.validExamList;
+        tempLst.reverse();
+        if (tempLst.length > 0) {
+            let flag = 0;
+            let current = 0;
+            let resultLst = [];
+            for (const id of tempLst) {
+                if (id === examId) {
+                    flag = 1;
+                }
+                if (current >= count) {
+                    break;
+                }
+                if (flag) {
+                    resultLst.push(id);
+                    current ++;
+                }
+            }
+            return resultLst.reverse();
+        } else {
+            return -1;
+        }
+    }
+
     async doGetExamDetailByPerson(studentId) {
         let response = await fetch(`${protocolPrefix}${host}/api/scores/data/by_person/${studentId}/exam_detail`);
         let data = await response.json();
@@ -429,7 +454,6 @@ class PersonPage {
         while (chartDiv.firstChild) {
             chartDiv.removeChild(chartDiv.firstChild);
         }
-        let subjectName = subjectIdToName[subjectId];
 
         let show = 0;
         const thisDiv = document.createElement("div");
@@ -452,7 +476,10 @@ class PersonPage {
         let gradeMaxScores = [];
         let gradeAvgScores = [];
         let gradeRanks = [];
-        for (const [examId, examDetail] of Object.entries(this.examDetailByPerson)) {
+        const examSelection = document.querySelector("#exam-selection");
+        let showLst = this.getBeginValidExamIdLst(Number(examSelection.value), 10);
+        for (const examId of showLst) {
+            const examDetail = this.examDetailByPerson[examId];
             if (subjectId in examDetail) {
                 show = 1;
                 labels.push(this.examIdToName[examId]);
