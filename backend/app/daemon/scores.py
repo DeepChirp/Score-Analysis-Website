@@ -181,7 +181,23 @@ def get_grade_total_rank(cur, exam_id, target_score):
     else:
         return data[0][0]
 
-
+@bp.route("/data/basic_info/by_class/<int:class_id>/valid_exam", methods=("GET",))
+def get_valid_exam(class_id):
+    db = get_db()
+    cur = db.cursor()
+    sql = "SELECT DISTINCT exam_id " \
+          "FROM scores " \
+          "INNER JOIN students " \
+          "ON students.id = scores.student_id " \
+          "WHERE class = ?"
+    cur.execute(sql, (class_id, ))
+    data = list(cur)
+    if len(data) == 0:
+        ret = {"code": 404, "msg": "Not Found.", "data": {}}
+    else:
+        result = [x[0] for x in data]
+        ret = {"code": 200, "msg": "Ok.", "data": {"validExams": result}}
+    return ret
 @bp.route("/data/chart_data/by_subject/<int:subject_id>/by_class/<int:class_id>")
 # 班级平均分，班级平均分排名，班级标准差，前十平均分，前十平均分排名，前十标准差，后十平均分，后十平均分排名，后十标准差 年级平均分
 def get_chart_data_by_subject(subject_id, class_id):

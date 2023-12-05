@@ -1,14 +1,12 @@
 # Backend Daemon V0.14.0
 
-- Implemention API V0.14.0
+- Implemention API V0.15.0
 
-# API V0.14.0
+# API V0.15.0
 
-## V0.14.0改动
-- 新增`data/upload`
-- 新增`/data/loadcsv/<int:unique_id>`
-- 新增`/basic_info/saved_name/<int:exam_id>`
-- 新增`/data/downloadcsv/<int:exam_id>`
+## V0.15.0改动
+- 新增`/data/basic_info/by_class/<int:class_id>/valid_exam`
+
 
 SubjectId与科目名称对照表：
 |SubjectId|SubjectName|
