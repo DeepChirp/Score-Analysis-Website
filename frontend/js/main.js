@@ -149,7 +149,9 @@ function loadPageContent(url) {
         var oldLinks = Array.from(document.getElementsByTagName('link'));
 
         // 从加载的内容中提取<link>元素
-        $data.filter('link[rel="stylesheet"]').add($data.find('link[rel="stylesheet"]')).each(function () {
+        var newLinks = $data.filter('link[rel="stylesheet"]').add($data.find('link[rel="stylesheet"]'));
+
+        newLinks.each(function () {
             var cssHref = this.href;
 
             // 检查CSS文件是否已经被加载过
@@ -170,7 +172,12 @@ function loadPageContent(url) {
 
         // 移除旧的<link>元素
         oldLinks.forEach(function (link) {
-            if (!link.href.includes('navbar.css') && !link.href.includes('footer.css') && !link.href.includes('main.css')) {
+            // 检查新加载的内容中是否包含这个<link>元素
+            var isLinkInNewContent = Array.prototype.some.call(newLinks, function (newLink) {
+                return newLink.href === link.href;
+            });
+
+            if (!isLinkInNewContent && !link.href.includes('navbar.css') && !link.href.includes('footer.css') && !link.href.includes('main.css')) {
                 link.parentNode.removeChild(link);
             }
         });
