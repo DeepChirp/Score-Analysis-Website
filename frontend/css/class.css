@@ -1,12 +1,18 @@
+:root {
+    --main-color: #007bff;
+    --hover-color: #0056b3;
+    --disabled-color: #ddd;
+    --disabled-text-color: gray;
+    --button-padding: 10px 20px;
+}
+
 .class-selection-div {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 10px;
-    margin-bottom: 20px;
+    margin: 0 auto 20px;
     max-width: 80%;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .class-selection-div .select-group {
@@ -21,20 +27,19 @@
 
 .class-selection-div select {
     padding: 10px;
+    border: 1px solid var(--disabled-color);
     border-radius: 5px;
-    border: 1px solid #ddd;
 }
 
 .button-group {
     display: flex;
     justify-content: center;
-    margin-top: 5px;
-    margin-bottom: 30px;
+    margin: 5px 0 30px;
 }
 
 .button-group button {
-    padding: 10px 20px;
-    background-color: #007bff;
+    padding: var(--button-padding);
+    background-color: var(--main-color);
     color: white;
     border: none;
     border-radius: 5px;
@@ -43,12 +48,12 @@
 }
 
 .button-group button:hover {
-    background-color: #0056b3;
+    background-color: var(--hover-color);
 }
 
 .button-group button:disabled {
-    background-color: #ddd;
-    color: gray;
+    background-color: var(--disabled-color);
+    color: var(--disabled-text-color);
     cursor: not-allowed;
 }
 
