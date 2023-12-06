@@ -1,6 +1,6 @@
-# Backend Daemon V0.14.0
+# Backend Daemon V0.15.1
 
-- Implemention API V0.15.0
+- Fix Nan when class_data[exam_id]["last10AvgScore"] is [].
 
 # API V0.15.0
 
