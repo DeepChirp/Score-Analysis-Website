@@ -1,6 +1,6 @@
-# Backend Daemon V0.15.1
+# Backend Daemon V0.15.2
 
-- Fix Nan when class_data[exam_id]["last10AvgScore"] is [].
+- Fix mismatched argument in cur.execute.
 
 # API V0.15.0
 

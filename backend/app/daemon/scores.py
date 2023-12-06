@@ -205,7 +205,6 @@ def get_chart_data_by_subject(subject_id, class_id):
     db = get_db()
     cur = db.cursor()
     class_data = {}
-    current_app.logger.error("alfjsslajfdg")
     if subject_id != 255:
         class_avg_sql = "SELECT exam_id, AVG(value) " \
                         "FROM scores " \
@@ -254,7 +253,6 @@ def get_chart_data_by_subject(subject_id, class_id):
             class_data[exam_id]["first10AvgScoreRank"] = get_grade_rank(cur, subject_id, exam_id,
                                                                         class_data[exam_id]["first10AvgScore"])
             class_data[exam_id]["first10std"] = numpy.std(score_lst)
-        current_app.logger.error("xxxxx:{}".format(class_data))
         for exam_id in class_data.keys():
             last10_data_sql = "SELECT value " \
                                "FROM scores " \
@@ -267,10 +265,6 @@ def get_chart_data_by_subject(subject_id, class_id):
                                "LIMIT 10"
             cur.execute(last10_data_sql, (exam_id, subject_id, class_id))
             data = list(cur)
-            current_app.logger.error(exam_id)
-            current_app.logger.error(subject_id)
-            current_app.logger.error(class_id)
-            current_app.logger.error(data)
             score_lst = [x[0] for x in data]
             class_data[exam_id]["last10AvgScore"] = numpy.average(score_lst)
             class_data[exam_id]["last10AvgScoreRank"] = get_grade_rank(cur, subject_id, exam_id,
@@ -322,7 +316,7 @@ def get_chart_data_by_subject(subject_id, class_id):
                                            "GROUP BY student_id " \
                                            "ORDER BY SUM(value) DESC " \
                                            "LIMIT 10"
-            cur.execute(class_total_first10_data_sql, (exam_id, class_id))
+            cur.execute(class_total_first10_data_sql, (exam_id, class_id, exam_id))
             score_lst = [x[0] for x in list(cur)]
             if len(score_lst) == 0:
                 continue
@@ -342,8 +336,6 @@ def get_chart_data_by_subject(subject_id, class_id):
                                           "LIMIT 10"
             cur.execute(class_total_last10_data_sql, (exam_id, class_id, exam_id))
             data = list(cur)
-            current_app.logger.error(exam_id)
-            current_app.logger.error(data)
             score_lst = [x[0] for x in data]
             if len(score_lst) == 0:
                 continue
