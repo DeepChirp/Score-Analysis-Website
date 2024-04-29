@@ -16,3 +16,5 @@ build/
 *.egg-info/
 
 *.pptx
+
+backend/app/data/csv_back

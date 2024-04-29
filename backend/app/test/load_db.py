@@ -97,7 +97,7 @@ for filename in filename_list:
     front, prefix = filename.split(".")
     if prefix == "csv":
         semester_name, exam_name = front[2:].split("_")
-        csv_reader = csv.reader(open("../data/csv/{}".format(filename), encoding="GB18030"))
+        csv_reader = csv.reader(open("../data/csv/{}".format(filename), encoding="UTF-8"))
         print("../data/csv/{}".format(filename))
         for row in csv_reader:
             grade_name, class_id, student_name, chinese, math, english, physics, chemistry, biology, politic, history, geography = row
