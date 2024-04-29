@@ -12,12 +12,12 @@ class ClassPage {
     }
 
     async doGetExamInfo() {
-        let response = await fetch(`${protocolPrefix}${host}/api/scores/basic_info/exam`);
+        let response = await fetch(`api/scores/basic_info/exam`);
         let data = await response.json();
         return data;
     }
     async doGetClassListByExamId(examId) {
-        let response = await fetch(`${protocolPrefix}${host}/api/scores/basic_info/class/${examId}`);
+        let response = await fetch(`api/scores/basic_info/class/${examId}`);
         let data = await response.json();
         if (data["code"] == 200) {
             return data["data"]["classes"];
@@ -28,13 +28,13 @@ class ClassPage {
     }
 
     async doGetValidNum(examId, classId) {
-        let response = await fetch(`${protocolPrefix}${host}/api/scores/basic_info/by_class/${classId}/exam/${examId}`);
+        let response = await fetch(`api/scores/basic_info/by_class/${classId}/exam/${examId}`);
         let data = await response.json();
         return data;
     }
 
     async doGetClassAnalysis(examId, classId) {
-        let response = await fetch(`${protocolPrefix}${host}/api/scores/analysis/by_class/${classId}/exam/${examId}`);
+        let response = await fetch(`api/scores/analysis/by_class/${classId}/exam/${examId}`);
         let data = await response.json();
         return data;
     }
@@ -131,7 +131,7 @@ class ClassPage {
     }
 
     async doGetOverallData(examId) {
-        let response = await fetch(`${protocolPrefix}${host}/api/scores/basic_info/subject_overall_data/exam/${examId}`);
+        let response = await fetch(`api/scores/basic_info/subject_overall_data/exam/${examId}`);
         let data = await response.json();
         return data;
     }
@@ -227,13 +227,13 @@ class ClassPage {
         }
     }
     async doGetClassAnalysisBySubject(classId, subjectId) {
-        let response = await fetch(`${protocolPrefix}${host}/api/scores/data/chart_data/by_subject/${subjectId}/by_class/${classId}`);
+        let response = await fetch(`api/scores/data/chart_data/by_subject/${subjectId}/by_class/${classId}`);
         let data = await response.json();
         return data;
     }
 
     async doGetValidExamList(class_id) {
-        const response = await fetch(`${protocolPrefix}${host}/api/scores/data/basic_info/by_class/${class_id}/valid_exam`);
+        const response = await fetch(`api/scores/data/basic_info/by_class/${class_id}/valid_exam`);
         return await response.json();
     }
 

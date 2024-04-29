@@ -13,12 +13,12 @@ class PersonPage {
         this.personScoresList = [];
     }
     async doGetExamInfo() {
-        let response = await fetch(`${protocolPrefix}${host}/api/scores/basic_info/exam`);
+        let response = await fetch(`api/scores/basic_info/exam`);
         let data = await response.json();
         return data;
     }
     async doGetClassListByExamId(examId) {
-        let response = await fetch(`${protocolPrefix}${host}/api/scores/basic_info/class/${examId}`);
+        let response = await fetch(`api/scores/basic_info/class/${examId}`);
         let data = await response.json();
         if (data["code"] == 200) {
             return data["data"]["classes"];
@@ -71,7 +71,7 @@ class PersonPage {
         });
     }
     async doGetPersonData(studentId, examId) {
-        let response = await fetch(`${protocolPrefix}${host}/api/scores/data/by_person/${studentId}/exam/${examId}`);
+        let response = await fetch(`api/scores/data/by_person/${studentId}/exam/${examId}`);
         let data = await response.json();
         const studentSelection = document.querySelector("#student-selection");
         await this.updateValidExamList(this.studentNameToId[studentSelection.value]);
@@ -127,7 +127,7 @@ class PersonPage {
         }
     }
     async doGetClassInfo(classId, examId) {
-        let response = await fetch(`${protocolPrefix}${host}/api/scores/data/by_class/${classId}/exam/${examId}`);
+        let response = await fetch(`api/scores/data/by_class/${classId}/exam/${examId}`);
         let data = await response.json();
         return data;
     }
@@ -379,7 +379,7 @@ class PersonPage {
 
     }
     async doGetExamListByPerson(studentId) {
-        let response = await fetch(`${protocolPrefix}${host}/api/scores/data/by_person/${studentId}/exam`);
+        let response = await fetch(`api/scores/data/by_person/${studentId}/exam`);
         let data = await response.json();
         return data;
     }
@@ -434,7 +434,7 @@ class PersonPage {
     }
 
     async doGetExamDetailByPerson(studentId) {
-        let response = await fetch(`${protocolPrefix}${host}/api/scores/data/by_person/${studentId}/exam_detail`);
+        let response = await fetch(`api/scores/data/by_person/${studentId}/exam_detail`);
         let data = await response.json();
         return data;
     }
@@ -582,7 +582,7 @@ class PersonPage {
     }
 
     async doGetOverallData(examId) {
-        let response = await fetch(`${protocolPrefix}${host}/api/scores/basic_info/subject_overall_data/exam/${examId}`);
+        let response = await fetch(`api/scores/basic_info/subject_overall_data/exam/${examId}`);
         let data = await response.json();
         return data;
     }

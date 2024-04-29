@@ -8,7 +8,7 @@ class DataPage {
     }
 
     async doGetExamInfo() {
-        let response = await fetch(`${protocolPrefix}${host}/api/scores/basic_info/exam`);
+        let response = await fetch(`api/scores/basic_info/exam`);
         let data = await response.json();
         return data;
     }
@@ -71,7 +71,7 @@ class DataPage {
     }
 
     async doTriggerCsvLoad(uniqueId) {
-        let response = await fetch(`${protocolPrefix}${host}/api/scores/data/loadcsv/${uniqueId}`);
+        let response = await fetch(`api/scores/data/loadcsv/${uniqueId}`);
         let data = await response.json();
         return data;
     }
@@ -94,12 +94,12 @@ class DataPage {
     }
 
     async doDownloadData(exam_id) {
-        let response = await fetch(`${protocolPrefix}${host}/api/scores/data/downloadcsv/${exam_id}`);
+        let response = await fetch(`api/scores/data/downloadcsv/${exam_id}`);
         return response.text();
     }
 
     async doGetSavedName(exam_id) {
-        let response = await fetch(`${protocolPrefix}${host}/api/scores/basic_info/saved_name/${exam_id}`);
+        let response = await fetch(`api/scores/basic_info/saved_name/${exam_id}`);
         let data = await response.json();
         return data;
     }
@@ -133,7 +133,7 @@ class DataPage {
             acceptedFileTypes: ['text/csv', 'application/vnd.ms-excel'],
             server: {
                 process: {
-                    url: '/api/scores/data/upload',
+                    url: 'api/scores/data/upload',
                     onload: (uniqueId) => {
                         this.uniqueIdLst.push(uniqueId);
                         const countSpan = document.querySelector(".file-uploader-counts");
