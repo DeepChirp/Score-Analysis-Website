@@ -9,3 +9,4 @@ numpy
 packaging
 Werkzeug
 gunicorn
+redis

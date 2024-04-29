@@ -82,6 +82,11 @@ class DataPage {
             const data = await this.doTriggerCsvLoad(uniqueId);
             if (data["code"] === 200) {
                 loadedCount++;
+            } else if (data["code"] === 10001){
+                const resultDiv = document.querySelector(".file-uploader-result");
+                resultDiv.textContent = `考试："${data["msg"]}"已存在！`;
+                resultDiv.hidden = false;
+                return;
             } else {
                 // TODO: Show error message if request failed?
             }

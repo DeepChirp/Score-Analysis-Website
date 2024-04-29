@@ -37,6 +37,13 @@ services:
       TZ: Asia/Shanghai
     ports:
       - "8080:80"
+  
+  redis:
+    image: redis
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+      - "6379:6379"
 
 
 volumes:
