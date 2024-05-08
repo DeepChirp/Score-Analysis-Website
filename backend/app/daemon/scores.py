@@ -1250,7 +1250,7 @@ def load_csv(unique_id):
             redis_keys = redis.keys()
 
             for key in redis_keys:
-                if key.startswith("grades_valid"):
+                if key.startswith(b"grades_valid"):
                     redis.set(key, b"0")
 
             load_db(filename, db, reader)
